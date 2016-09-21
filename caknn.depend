@@ -193,3 +193,53 @@
 	"f_def.h"
 	"../gadget/gadget.h"
 
+1218134308 source:/home/mgh/caknnSR/caknn/blockfile/blk_file.cpp
+	<string.h>
+	"blk_file.h"
+	"../gadget/gadget.h"
+
+1217593092 /home/mgh/caknnSR/caknn/blockfile/blk_file.h
+	<stdio.h>
+	"f_def.h"
+
+1217950950 /home/mgh/caknnSR/caknn/blockfile/f_def.h
+	<stdio.h>
+
+1250698888 /home/mgh/caknnSR/caknn/gadget/gadget.h
+	<stdio.h>
+	"../heap/binheap.h"
+
+1218124794 /home/mgh/caknnSR/caknn/heap/binheap.h
+
+1217950932 source:/home/mgh/caknnSR/caknn/blockfile/f_def.cpp
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	"f_def.h"
+	"../gadget/gadget.h"
+
+1250775892 source:/home/mgh/caknnSR/caknn/btree/b-entry.cpp
+	<stdio.h>
+	<memory.h>
+	"b-node.h"
+	"b-entry.h"
+	"b-tree.h"
+	"b-def.h"
+	"../gadget/gadget.h"
+
+1218126602 /home/mgh/caknnSR/caknn/btree/b-node.h
+	"b-def.h"
+
+1217933448 /home/mgh/caknnSR/caknn/btree/b-def.h
+	<stdlib.h>
+	<stdio.h>
+
+1225450364 /home/mgh/caknnSR/caknn/btree/b-entry.h
+
+1250776340 /home/mgh/caknnSR/caknn/btree/b-tree.h
+	"b-def.h"
+	"../blockfile/cache.h"
+
+982684800 /home/mgh/caknnSR/caknn/blockfile/cache.h
+	"f_def.h"
+
