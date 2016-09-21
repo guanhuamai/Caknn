@@ -4,7 +4,7 @@
 #define __Matrix
 
 
-#include "../btree/b-tree.h"
+
 
 
 
@@ -20,7 +20,7 @@ public:
 
 
 protected:
-    B_Tree* addrBtree;
+
 
 
 

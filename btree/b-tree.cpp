@@ -906,3 +906,41 @@ B_Node *B_Tree::new_one_node()
 
 	return nd;
 }
+
+
+/*****************************************************************
+by guanhua mai,
+*****************************************************************/
+
+void B_Tree::insertKV(int* key, size_t valueAddr){
+
+    B_Entry* et = this->new_one_entry();
+    et->init(this, 0);
+    et->son = valueAddr;
+    for(int i = 0; i < this->keysize; i++){
+        et->key[i] = key[i];
+    }
+    this->insert(et);//no need to close it here, will be deleted at the bottom of the tree
+}
+
+
+size_t B_Tree::findValueByKey(int* key, B_Node* node){//find key from root to the bottom of the tree
+
+    size_t ret = (size_t) -1;//convert -1 to the maximum value, use as a flag
+
+    int follow = node->max_lesseq_key_pos(key);
+
+	if (node->level == 0 && node->is_eq_key_pos(key, follow))//leaf
+	{
+		ret = node->entries[follow]->son;
+	}
+
+	if (follow != -1)
+	{
+		B_Node *succ = node->entries[follow]->get_son();
+		ret = findValueByKey(key, succ);
+		node->entries[follow]->del_son();
+	}
+
+	return ret;
+}

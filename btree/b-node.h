@@ -60,6 +60,9 @@ public:
 	//B_Entry *rank_find(float _rank);
 	//float sumagg();
 
+
+	virtual bool is_eq_key_pos(int* key, int pos);
+    virtual int max_lesseq_key_pos(int *_key);
 };
 
 //-----------------------------------------------

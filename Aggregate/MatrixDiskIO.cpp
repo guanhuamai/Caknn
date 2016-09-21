@@ -6,11 +6,11 @@
 
 
 
-int DskContrlr::getBlockLength() {
+int DataCache::getBlockLength() {
 	return blocklength;
 }
 
-void DskContrlr::InitCache(int csize, int blength) {
+void DataCache::InitCache(int csize, int blength) {
 	LastBlockId=-2;
 	nextTime=0;
 	cachesize=csize;
@@ -26,7 +26,7 @@ void DskContrlr::InitCache(int csize, int blength) {
 	}
 }
 
-void DskContrlr::RefreshStat() {
+void DataCache::RefreshStat() {
 	SEQ_PAGE_ACCESS=0;
 	RAN_PAGE_ACCESS=0;
 	INDEX_PAGE_ACCESS=0;
@@ -34,7 +34,7 @@ void DskContrlr::RefreshStat() {
 	CACHE_ACCESSED=0;
 }
 
-void DskContrlr::RefreshCache() {	// call before query execution
+void DataCache::RefreshCache() {	// call before query execution
 	LastBlockId=-2;
 	nextTime=0;
 	for (int i=0;i<cachesize;i++) {
@@ -43,7 +43,7 @@ void DskContrlr::RefreshCache() {	// call before query execution
 	}
 }
 
-void DskContrlr::DestroyCache() {
+void DataCache::DestroyCache() {
 	// no need to flush the cache (since the query alg. are read-only )
 	delete[] cache_block;
 	delete[] lastTime;
@@ -52,7 +52,7 @@ void DskContrlr::DestroyCache() {
 }
 
 
-bool DskContrlr::getCacheBlock(char* buffer,int BlockId) {
+bool DataCache::getCacheBlock(char* buffer,int BlockId) {
 	CACHE_ACCESSED++;
 	for (int i=0;i<cachesize;i++)
 		if ((cache_block[i]==BlockId)&&
@@ -66,7 +66,7 @@ bool DskContrlr::getCacheBlock(char* buffer,int BlockId) {
 
 // user's responsibility
 // the place for counting number of page accesses
-void DskContrlr::storeCacheBlock(char* buffer, int BlockId) {
+void DataCache::storeCacheBlock(char* buffer, int BlockId) {
 	int index=-1;
 	for (int i=0;i<cachesize;i++)	// search for empty block
 		if (lastTime[i]<0) {index=i;	break;}
@@ -89,7 +89,7 @@ void DskContrlr::storeCacheBlock(char* buffer, int BlockId) {
 	LastBlockId=BlockId;
 }
 
-void DskContrlr::printPageAccess() {
+void DataCache::printPageAccess() {
 	printf("Cache requests:\t%d\n",CACHE_ACCESSED);
 	printf("Index page accesses:\t%d\n",INDEX_PAGE_ACCESS);
 	printf("Data page accesses:\t%d\n",DATA_PAGE_ACCESS);

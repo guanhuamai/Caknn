@@ -307,16 +307,19 @@ BINSRT B_Node::insert(B_Entry *_new_e, B_Node **_new_nd)
 }
 
 //-----------------------------------------------
-/*
-int B_Node::max_lesseq_key_pos(float _key)
+
+bool B_Node::is_eq_key_pos(int* key, int pos)
 {
-	int pos = -1;
-	for (int i = num_entries - 1; i >= 0; i --)
-		if (entries[i]->key <= _key)
-		{ pos = i; i = -1;}
-	return pos;
+    if (pos == -1) return false;
+    for(int i = 0; i < my_tree->keysize; i++){
+        if (entries[pos]->key[i] != key[i])
+        {
+            return false;
+        }
+    }
+	return true;
 }
-*/
+
 
 /*****************************************************************
 finds the entry that is just before the given (key, leafson) pair
@@ -331,7 +334,7 @@ Coded by Yufei Tao, 31 july 08
 int B_Node::max_lesseq_key_pos(B_Entry *_e)
 {
 	int pos = -1;
-	for (int i = num_entries - 1; i >= 0; i --)
+	for (int i = num_entries - 1; i >= 0; i --)//btree is increase order, search from the bigger end
 	{
 		int rslt = entries[i]->compare(_e);
 		if (rslt == -1 || rslt == 0)
@@ -339,6 +342,47 @@ int B_Node::max_lesseq_key_pos(B_Entry *_e)
 			pos = i;
 			break;
 		}
+	}
+
+	return pos;
+}
+
+
+
+/*****************************************************************
+finds the entry that is just before the given key
+
+para:
+- key:
+
+added by guanhua mai
+*****************************************************************/
+
+int B_Node::max_lesseq_key_pos(int *_key)
+{
+	int pos = -1;
+	for (int i = num_entries - 1; i >= 0; i --)//btree is increase order, search from the bigger end
+	{
+		int ret = 0;
+
+        for (int j = 0; j < my_tree->keysize; j ++)
+        {
+            if (entries[i]->key[j] < _key[j])
+            {
+                ret = -1;
+                break;
+            }
+            else if (entries[i]->key[j] > _key[j])
+            {
+                ret = 1;
+                break;
+            }
+        }
+
+        if (ret == 0 || ret == -1){
+            pos = i;
+            break;
+        }
 	}
 
 	return pos;

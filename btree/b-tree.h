@@ -53,6 +53,10 @@ public:
 	virtual int traverse(float *_info);
 	virtual int write_header(char *_buf);
 
+
+
+    virtual void insertKV(int* key, size_t valueAddr);
+    virtual size_t findValueByKey(int* key, B_Node* rootNode);
 	//B_Entry *rank_find(float _rank);
 };
 
