@@ -77,8 +77,11 @@ void ExtSort::get_run_fname(int _step, int _run, char *_fname)
 	char *step_name = new char[100];
 	char *run_name = new char[100];
 
-	itoa(_step, step_name, 10);
-	itoa(_run, run_name, 10);
+	//itoa(_step, step_name, 10);
+	//itoa(_run, run_name, 10);
+    snprintf(step_name, 100, "%d", _step);
+    snprintf(run_name, 100, "%d", _run);
+
 	strcpy(_fname, working_folder);
 	strcat(_fname, step_name);
 	strcat(_fname, "-");
@@ -154,7 +157,7 @@ int ExtSort::merge_runs(int _pass, int _run_num)
 		hp->ext_sort_comp_func = compare_func;
 
 		//----- get the first record from each file -----
-		for (i = 0; i < num_act_runs; i ++)
+		for (int i = 0; i < num_act_runs; i ++)
 		{
 			ExtSort_heap_entry_data *item = new ExtSort_heap_entry_data;
 			item->file_id = i;
@@ -218,14 +221,14 @@ if (prev_he)
 		num_completed_runs += num_act_runs;
 	}
 
-	for (i = 0; i < n; i ++)
+	for (int i = 0; i < n; i ++)
 		destroy_elem(&mem[i]);
 	delete [] mem;
 
 	delete [] files;
 
 	//----- remove the run files of the previous pass -----
-	for (i = 0; i < _run_num; i ++)
+	for (int i = 0; i < _run_num; i ++)
 	{
 		get_run_fname(_pass, i + 1, fname);
 		remove(fname);
@@ -372,7 +375,7 @@ int ExtSort::get_initial_runs()
 				exit(1);
 			}
 
-			for (i = 0; i < r_cnt; i ++)
+			for (int i = 0; i < r_cnt; i ++)
 			{
 				write_elem(ofp, mem[i]);
 			}
@@ -388,7 +391,7 @@ int ExtSort::get_initial_runs()
 		}
 	}
 
-	for (i = 0; i < n; i ++)
+	for (int i = 0; i < n; i ++)
 		destroy_elem(&mem[i]);
 	delete [] mem;
 
@@ -584,12 +587,14 @@ void get_leading_folder(char *_path, char *_folder)
 		}
 	}
 
-	for (i = 0; i <= pos; i ++)
+    int tmp = 0;
+	for (int i = 0; i <= pos; i ++)
 	{
 		_folder[i] = _path[i];
+		tmp = i;
 	}
 
-	_folder[i] = '\0';
+	_folder[tmp] = '\0';
 }
 
 /*****************************************************************

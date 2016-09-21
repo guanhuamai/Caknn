@@ -802,7 +802,7 @@ int B_Node::traverse(float *_info)
 		if (left_sibling != my_tree->last_leaf)
 		{
 			printf("Left sibling ptr error\n");
-			printf("Block %d, level %d, entry %d\n", block, level, i);
+			//printf("Block %d, level %d, entry %d\n", block, level, i);
 			printf("Capacity = %d\n", capacity);
 			printf("Seen %d entries so far.\n", (int) _info[0]);
 			error("I am aborting...\n", true);
@@ -811,7 +811,7 @@ int B_Node::traverse(float *_info)
 		if (my_tree->last_right_sibling != -1 && my_tree->last_right_sibling != block)
 		{
 			printf("Right sibling ptr error\n");
-			printf("Block %d, level %d, entry %d\n", block, level, i);
+			//printf("Block %d, level %d, entry %d\n", block, level, i);
 			error("I am aborting...\n", true);
 		}
 
