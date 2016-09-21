@@ -1,4 +1,4 @@
-/* this class defines class B_Node 
+/* this class defines class B_Node
    coded by TAO Yufei */
 
 #ifndef _B_Node
@@ -59,7 +59,7 @@ public:
 
 	//B_Entry *rank_find(float _rank);
 	//float sumagg();
-	
+
 };
 
 //-----------------------------------------------

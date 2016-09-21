@@ -38,7 +38,7 @@ void B_Node::init(int _level, B_Tree *_B_Tree)
 {
 	my_tree = _B_Tree;
 	int b_length = my_tree -> file -> get_blocklength();
-	
+
 	left_sibling = -1;
 	right_sibling = -1;
 	num_entries = 0;
@@ -46,7 +46,7 @@ void B_Node::init(int _level, B_Tree *_B_Tree)
 
 	B_Entry *e = new_one_entry();
 	e->init(_B_Tree, _level);
-	int entry_size = e->get_size(level);  
+	int entry_size = e->get_size(level);
 	e->close();
 	delete e;
 
@@ -83,7 +83,7 @@ void B_Node::init(B_Tree *_B_Tree, int _block)
 
     int header_size = get_header_size();
 	int b_len = my_tree -> file -> get_blocklength();
-    
+
     block = _block;
     char *blk = new char[b_len];
     if (my_tree -> cache == NULL) // no cache
@@ -94,7 +94,7 @@ void B_Node::init(B_Tree *_B_Tree, int _block)
 	memcpy(&level, blk, sizeof(level));
 	B_Entry *e = new_one_entry();
 	e->init(_B_Tree, level);
-	int entry_size = e->get_size(level);  
+	int entry_size = e->get_size(level);
 	e->close();
 	delete e;
 
@@ -147,7 +147,7 @@ B_Node::~B_Node()
 void B_Node::add_new_child(B_Node *_cnd)
 {
 	B_Entry *e = new_one_entry();
-	e->init(my_tree, level); 
+	e->init(my_tree, level);
 
 	e->set_from_child(_cnd);
 
@@ -181,8 +181,8 @@ bool B_Node::chk_undrflw()
 
 int B_Node::choose_subtree(B_Entry *_new_e)
 {
-	int follow = max_lesseq_key_pos(_new_e); 
-	
+	int follow = max_lesseq_key_pos(_new_e);
+
 	return follow;
 }
 
@@ -191,7 +191,7 @@ int B_Node::choose_subtree(B_Entry *_new_e)
 void B_Node::enter(B_Entry *_new_e)
 {
 	int pos = -1;
-	
+
 	pos = max_lesseq_key_pos(_new_e);
 	pos ++;														//this is the position of the new key
 
@@ -215,8 +215,8 @@ bool B_Node::find_key(float _k)
 	{
 		for (int i = 0; i < num_entries; i ++)
 			if (fabs(entries[i]->key - _k) < FLOATZERO)
-			{ 
-				ret = true; i = num_entries; 
+			{
+				ret = true; i = num_entries;
 			}
 		return ret;
 	}
@@ -249,7 +249,7 @@ B_Entry ** B_Node::get_entries(int _cap)
 //-----------------------------------------------
 
 int B_Node::get_header_size()
-{ 
+{
 	return sizeof(level) + sizeof(block) + sizeof(left_sibling) + sizeof(right_sibling);
 }
 
@@ -260,7 +260,7 @@ BINSRT B_Node::insert(B_Entry *_new_e, B_Node **_new_nd)
 	BINSRT ret = B_NRML;
 	if (level == 0)
 	{
-		enter(_new_e);  
+		enter(_new_e);
 		_new_e->close();
 		delete _new_e;
 		if (chk_ovrflw())
@@ -271,7 +271,7 @@ BINSRT B_Node::insert(B_Entry *_new_e, B_Node **_new_nd)
 		return ret;
 	}
 
-	int follow = choose_subtree(_new_e); 
+	int follow = choose_subtree(_new_e);
 
 	bool need_update = false;
 
@@ -281,10 +281,10 @@ BINSRT B_Node::insert(B_Entry *_new_e, B_Node **_new_nd)
 		follow = 0;
 	}
 
-	B_Node *succ = entries[follow]->get_son();  
+	B_Node *succ = entries[follow]->get_son();
 	B_Node *new_nd = NULL;
 	BINSRT c_ret = succ->insert(_new_e, &new_nd);
-	
+
 	if (need_update)
 	{
 		entries[follow]->set_from_child(succ);
@@ -294,10 +294,10 @@ BINSRT B_Node::insert(B_Entry *_new_e, B_Node **_new_nd)
 	//entries[follow].agg=succ->sumagg();
 	//dirty=true;
 
-	entries[follow]->del_son();  
-	
+	entries[follow]->del_son();
+
 	if (c_ret == B_OVRFLW)
-		add_new_child(new_nd); 
+		add_new_child(new_nd);
 	if (chk_ovrflw())
 	{
 		trt_ovrflw(_new_nd);
@@ -322,7 +322,7 @@ int B_Node::max_lesseq_key_pos(float _key)
 finds the entry that is just before the given (key, leafson) pair
 
 para:
-- key: 
+- key:
 - leafson:
 
 Coded by Yufei Tao, 31 july 08
@@ -433,7 +433,7 @@ void B_Node::read_from_buffer(char *_buf)
 
 	for (int j = 0; j < num_entries; j ++)
 	{
-		entries[j]->read_from_buffer(&_buf[i]); 
+		entries[j]->read_from_buffer(&_buf[i]);
 		i += entries[j]->get_size(entries[j]->level);
 	}
 }
@@ -476,7 +476,7 @@ void B_Node::rmv_entry(int _pos)
 void B_Node::trt_ovrflw(B_Node **_new_nd)
 {
 	*_new_nd = new_one_node();
-	(*_new_nd)->init(level, my_tree);  
+	(*_new_nd)->init(level, my_tree);
 	(*_new_nd)->level = level;
 
 	int i = (capacity - 1) / 2 ;
@@ -496,7 +496,7 @@ void B_Node::trt_ovrflw(B_Node **_new_nd)
 		nd->init(my_tree, (*_new_nd)->right_sibling);
 		nd->left_sibling = (*_new_nd)->block;
 		nd->dirty = true;
-		delete nd; 
+		delete nd;
 	}
 }
 
@@ -516,7 +516,7 @@ void B_Node::write_to_buffer(char *_buf)
 
 	for (int j = 0; j < num_entries; j ++)
 	{
-		entries[j]->write_to_buffer(&_buf[i]); 
+		entries[j]->write_to_buffer(&_buf[i]);
 		i += entries[j]->get_size(entries[j]->level);
 	}
 }
@@ -537,14 +537,14 @@ float B_Node::sumagg()
 define the rank of an record o as the sum of the weights of all the records with keys smaller than o.key
 this function returns the record whose rank is "just larger" than given a rank value,
 para:
-rank: 
+rank:
 coded by yufei tao june 2003
 *****************************************************************/
 /*
 B_Entry *B_Node::rank_find(float _rank)
 {
 	float acc_rank=0;
-	if (level==0) 
+	if (level==0)
 	{
 		for (int i=0; i<num_entries; i++)
 		{
@@ -559,7 +559,7 @@ B_Entry *B_Node::rank_find(float _rank)
 		}
 		error("the entry not found\n", true);
 		return NULL;
-	}	
+	}
 	for (int i=0; i<num_entries; i++)
 	{
 		acc_rank += entries[i].agg;
@@ -605,13 +605,13 @@ BDEL B_Node::delete_entry(B_Entry *_del_e)
 				if (chk_undrflw())
 					ret = B_UNDRFLW;
 				else
-					ret = B_NONE;  
-				break; 
+					ret = B_NONE;
+				break;
 			}
 		}
 		return ret;
 	}
-	
+
 	int follow = choose_subtree(_del_e);
 
 	if (follow == -1)
@@ -624,7 +624,7 @@ BDEL B_Node::delete_entry(B_Entry *_del_e)
 	dirty = true;
 
 	entries[follow]->del_son();
-	
+
 	if (cret == B_NONE)
 		ret = B_NONE;
 	if (cret == B_UNDRFLW)
@@ -652,7 +652,7 @@ void B_Node::trt_undrflw(int _follow)
 	int mergesub = _follow + 1;									//the subscript of the non-leaf entry to merge with
 	if (_follow == num_entries - 1)
 		mergesub = _follow - 1;
-	
+
 	B_Node *succ1 = entries[mergesub]->get_son();
 	B_Node *succ2 = entries[_follow]->get_son();
 
@@ -662,7 +662,7 @@ void B_Node::trt_undrflw(int _follow)
 		//the merged node does not fit in one page.
 		//remember succ1 points to mergesub and succ2 points to follow
 
-		int n = succ1->num_entries; 
+		int n = succ1->num_entries;
 		if (mergesub > _follow)
 		{
 			for (int i = 0; i < totalnum / 2 - succ2->num_entries; i++)
@@ -679,9 +679,9 @@ void B_Node::trt_undrflw(int _follow)
 				succ1->rmv_entry(totalnum / 2);
 			}
 		}
-		entries[mergesub]->set_from_child(succ1); 
+		entries[mergesub]->set_from_child(succ1);
 		entries[_follow]->set_from_child(succ2);
-		
+
 		entries[mergesub]->del_son();
 		entries[_follow]->del_son();
 	}
@@ -721,7 +721,7 @@ void B_Node::trt_undrflw(int _follow)
 				nd->left_sibling = succ1->block;
 				nd->dirty = true;
 				delete nd;
-			} 
+			}
 		}
 
 		succ1->dirty = true;
@@ -738,7 +738,7 @@ void B_Node::trt_undrflw(int _follow)
 }
 
 /*****************************************************************
-traverse the suB_Tree 
+traverse the suB_Tree
 
 para:
 - info: an array for taking info out of the function
@@ -771,7 +771,7 @@ int B_Node::traverse(float *_info)
 		{
 			B_Node *nd = entries[i]->get_son();
 
-			bool equal = true; 
+			bool equal = true;
 
 			for (int j = 0; j < my_tree->keysize; j ++)
 				if (compfloats((float) entries[i]->key[j], (float) nd->entries[0]->key[j]) != 0)
@@ -814,7 +814,7 @@ int B_Node::traverse(float *_info)
 			printf("Block %d, level %d, entry %d\n", block, level, i);
 			error("I am aborting...\n", true);
 		}
-		
+
 		my_tree->last_leaf = block;
 		my_tree->last_right_sibling = right_sibling;
 	}

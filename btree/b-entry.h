@@ -1,4 +1,4 @@
-/* this file defines class B_Entry 
+/* this file defines class B_Entry
    coded by TAO Yufei */
 
 #ifndef __B_Entry
@@ -18,15 +18,15 @@ public:
 	int *key;
 
 	int leafson;										//this field is needed only at nonleaf levels
-														//(key, leafson) forms the search key. 
+														//(key, leafson) forms the search key.
 														//this is to ensure fast deletions when many leaf entries have
 														//the same key.
 	int son;
-	int level; 
+	int level;
 
 	//--==others==--
 	B_Tree *my_tree;
-	B_Node *son_ptr;	
+	B_Node *son_ptr;
 
 	//--==functions==--
 	B_Entry();

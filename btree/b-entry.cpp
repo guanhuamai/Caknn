@@ -10,8 +10,8 @@
 
 //-----------------------------------------------
 
-B_Entry::B_Entry() 
-		          
+B_Entry::B_Entry()
+
 {
 	son = -1;
 	key = NULL;
@@ -59,10 +59,10 @@ B_Entry::~B_Entry()
 //-----------------------------------------------
 
 int B_Entry::get_size(int _level)
-{ 
+{
 	int size;
-	
-	if (_level == 0) 
+
+	if (_level == 0)
 		size = sizeof(key) + sizeof(son) + sizeof(float) * my_tree->keysize;
 	else
 		size = sizeof(key) + sizeof(son) + sizeof(leafson) + sizeof(float) * my_tree->keysize;
@@ -77,7 +77,7 @@ B_Node *B_Entry::get_son()
 	if (son_ptr == NULL)
 	{
 		son_ptr = new_one_node();
-		son_ptr->init(my_tree, son); 
+		son_ptr->init(my_tree, son);
 	}
 	return son_ptr;
 }
@@ -86,11 +86,11 @@ B_Node *B_Entry::get_son()
 
 void B_Entry::del_son()
 {
-	if (son_ptr) 
-	{ 
-		delete son_ptr; 
+	if (son_ptr)
+	{
+		delete son_ptr;
 		son_ptr = NULL;
-	}  
+	}
 }
 
 //-----------------------------------------------
@@ -118,8 +118,8 @@ int B_Entry::read_from_buffer(char *_buf)
 //-----------------------------------------------
 
 void B_Entry::init(B_Tree *_B_Tree, int _level)
-{ 
-	my_tree = _B_Tree; 
+{
+	my_tree = _B_Tree;
 	level = _level;
 	key = new int[my_tree->keysize];
 }
@@ -171,7 +171,7 @@ coded by yufei tao june 2003
 
 bool B_Entry::equal_to(B_Entry *_e)
 {
-	bool ret = true; 
+	bool ret = true;
 
 	if (level != _e->level || son != _e->son || leafson != _e->leafson)
 		ret = false;
@@ -227,13 +227,13 @@ return
 - -1: the host entry comes first
   0: tie
   1: the host entry comes later
-  
+
 by yufei tao, 31 july 08
 *****************************************************************/
 
 int B_Entry::compare_key(B_Entry *_e)
 {
-	int ret = 0; 
+	int ret = 0;
 
 	for (int i = 0; i < my_tree->keysize; i ++)
 	{
@@ -262,7 +262,7 @@ return
 - -1: the host entry comes first
   0: tie
   1: the host entry comes later
-  
+
 by yufei tao, 31 july 08
 *****************************************************************/
 
@@ -275,7 +275,7 @@ int B_Entry::compare(B_Entry *_e)
 		if (leafson < _e->leafson)
 			ret = -1;
 		else if (leafson > _e->leafson)
-			ret = 1; 
+			ret = 1;
 	}
 
 	return ret;

@@ -43,7 +43,7 @@ Cache::~Cache()
 	//flush();
 	  //Note that here we no longer flush the buffers in the destructor.  You should
 	  //flush all the contents in the tree destructor instead
-      
+
 	delete[] cache_cont;
 	delete[] fuf_cont;
 	delete[] LRU_indicator;
@@ -95,7 +95,7 @@ int Cache::next()
     		 fuf_cont[ptr] = free;  dirty_indicator[ptr] = false;
 
     		 ret_val=ptr++;  ptr = ptr % cachesize;
-				
+
     		 return ret_val;
     	 }
     	 else  //a cache page has been found
@@ -165,7 +165,7 @@ bool Cache::write_block(Block block, int index, Cacheable *rt)
 	if(index <= rt->file->get_num_of_blocks() && index > 0)
 	{
     	c_ind = in_cache(index, rt);
-    	if(c_ind >= 0)	
+    	if(c_ind >= 0)
 		{
 			memcpy(cache[c_ind], block, blocklength);
 			dirty_indicator[c_ind] = true;

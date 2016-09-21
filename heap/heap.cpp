@@ -38,7 +38,7 @@ Heap::Heap()
 Heap::~Heap()
 {
 	printf("maximum heap size in execution = %d\n", maxused);
-	
+
 	if (cont)
 	{
 		for (int i = 0; i < hsize + 1; i ++)
@@ -69,7 +69,7 @@ This function enheaps an entry. It does NOT destroy the input entry.
 Parameters:
 - _he: the heap entry being en-heaped
 
-Output: 
+Output:
 - None
 
 Coded by yufei tao
@@ -96,11 +96,11 @@ void Heap::insert(HeapEntry *_he)
 			cont[child - 1]->copy(tmp_he);
 			delete tmp_he;
 		}
-		else 
+		else
 			parent = 1;
 	}
 
-	if (used > hsize)  
+	if (used > hsize)
 		//this is why the heap size is initiated with one more place than hsize (to facilitate
 		//coding)
 	{
@@ -113,7 +113,7 @@ bool Heap::remove(HeapEntry *_he)
 //this function deheaps an entry. the return value indicates whether successful: false
 //means heap is already empty
 {
-	if (used==0) 
+	if (used==0)
 		return false;
 	_he -> copy(cont[0]);
 	used--;
@@ -127,7 +127,7 @@ bool Heap::remove(HeapEntry *_he)
 		else
 			if (cont[2 * parent - 1]->key < cont[2 * parent]->key)
 				child = 2 * parent;
-			else 
+			else
 				child = 2 * parent + 1;
 
 		if (cont[parent - 1]->key > cont[child - 1]->key)
@@ -138,7 +138,7 @@ bool Heap::remove(HeapEntry *_he)
 			cont[parent - 1]->copy(cont[child - 1]);
 			cont[child - 1]->copy(the);
 			delete the;
-			parent = child; 
+			parent = child;
 		}
 		else
 			parent = used;
@@ -203,4 +203,3 @@ HeapEntry * Heap::new_one_HeapEntry()
 	return he;
 }
 
-	

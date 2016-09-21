@@ -14,7 +14,7 @@
 #include "../gadget/gadget.h"
 
 /*****************************************************************
-Use this constructor to create an empty b-tree 
+Use this constructor to create an empty b-tree
 para:
 
 
@@ -37,7 +37,7 @@ B_Tree::B_Tree()
 loads the tree from a tree file
 
 para:
-- fname: 
+- fname:
 - c:
 
 Coded by Yufei Tao 31 July 08
@@ -103,7 +103,7 @@ void B_Tree::close()
 
 B_Tree::~B_Tree()
 {
-	if (root_ptr) 
+	if (root_ptr)
 	{
 		error("b_tree::~b_tree - root_ptr not null. you forgot to call close().\n", true);
 	}
@@ -142,7 +142,7 @@ void B_Tree::insert(B_Entry *_new_e)
 	if (_new_e->son != _new_e->leafson)
 		error("B_Tree::insert - son and leafson unequal\n", true);
 
-	load_root(); 
+	load_root();
 
 //--=== debugging ===--
 /*
@@ -159,7 +159,7 @@ if (debug_info[0] == 0)
 	if (c_ret == B_OVRFLW)
 	{
 		B_Node *new_root = new_one_node();
-		new_root->init(root_ptr->level+1, this); 
+		new_root->init(root_ptr->level+1, this);
 			//the first paramemter just needs to be any value larger than 0
 		new_root -> level = root_ptr -> level + 1;
 		new_root -> add_new_child(root_ptr);
@@ -185,7 +185,7 @@ if (debug_info[0] == 0)
 
 void B_Tree::load_root()
 {
-	if (root_ptr == NULL) 
+	if (root_ptr == NULL)
 	{
 		root_ptr = new_one_node();
 		root_ptr->init(this, root);
@@ -234,7 +234,7 @@ int B_Tree::write_header(char *_buf)
 define the rank of an record o as the sum of the weights of all the records with keys smaller than o.key
 this function returns the record whose rank is "just larger" than given a rank value,
 para:
-rank: 
+rank:
 coded by yufei tao june 2003
 *****************************************************************/
 /*
@@ -259,7 +259,7 @@ coded by yufei tao june 2003
 
 bool B_Tree::delete_entry(B_Entry * _del_e)
 {
-	bool ret = true; 
+	bool ret = true;
 	load_root();
 	BDEL cret = root_ptr->delete_entry(_del_e);
 	if (cret == B_UNDRFLW)
@@ -277,7 +277,7 @@ bulkloads a tree. the records of the dataset must have been sorted
 in ascending order of their keys
 
 para:
-- fname: dataset 
+- fname: dataset
 
 Coded by Yufei Tao, 4 aug 08
 *****************************************************************/
@@ -288,15 +288,15 @@ void B_Tree::bulkload(char *_fname)
 	FILE *fp = fopen(_fname, "r");
 	if (!fp)
 		error("could not open the data source file\n", true);
-	
-	if (quiet <= 5) 
+
+	if (quiet <= 5)
 		printf("building the leaf level...\n");
 
 	int cnt = 0;													//cardinality
 
 	int start_block = 0, end_block = 0;
 	int prev_block = -1;
-	bool first_node = true; 
+	bool first_node = true;
 
 	B_Node *act_nd = NULL;
 	B_Node *prev_nd = NULL;
@@ -386,11 +386,11 @@ prev_e = NULL;
 //---------
 
 	fclose(fp);
-	
-	int current_level = 1; 
+
+	int current_level = 1;
 	int last_start_block = start_block, last_end_block = end_block;
 	first_node = true;
-	
+
 	while (last_end_block > last_start_block)
 	{
 		if (quiet <= 5)
@@ -459,7 +459,7 @@ prev_e->set_from(e);
 			{
 				prev_nd = act_nd;
 				act_nd = NULL;
-			} 
+			}
 
 			delete child;
 		}
@@ -486,15 +486,15 @@ prev_e = NULL;
 //---------
 	}
 
-	root = last_start_block; 
+	root = last_start_block;
 }
 
 /*****************************************************************
-bulkload a tree. difference from bulkload() is that here the 
+bulkload a tree. difference from bulkload() is that here the
 sorted dataset is in memory.
 
 -para-
-ds:		dataset 
+ds:		dataset
 n:		cardinality
 
 -return-
@@ -518,7 +518,7 @@ int B_Tree::bulkload2(void *_ds, int _n)
 	B_Node		* prevNd		= NULL;
 	bool		firstNode		= false;
 	int			cnt				= -1;
-	int			currentLevel	= -1; 
+	int			currentLevel	= -1;
 	int			endBlock		= -1;
 	int			i				= -1;
 	int			lastStartBlock	= -1;
@@ -527,12 +527,12 @@ int B_Tree::bulkload2(void *_ds, int _n)
 	int			startBlock		= -1;
 	void		* ptr			= NULL;
 
-	cnt = 0;													
+	cnt = 0;
 	startBlock = 0;
 	endBlock = 0;
 
 	prevBlock = -1;
-	firstNode = true; 
+	firstNode = true;
 
 	ptr = _ds;
 
@@ -592,8 +592,8 @@ int B_Tree::bulkload2(void *_ds, int _n)
 		actNd = NULL;
 	}
 
-	currentLevel	= 1; 
-	lastStartBlock	= startBlock; 
+	currentLevel	= 1;
+	lastStartBlock	= startBlock;
 	lastEndBlock	= endBlock;
 
 	while (lastEndBlock > lastStartBlock)
@@ -642,7 +642,7 @@ int B_Tree::bulkload2(void *_ds, int _n)
 			{
 				prevNd = actNd;
 				actNd = NULL;
-			} 
+			}
 
 			delete child;
 			child = NULL;
@@ -660,13 +660,13 @@ int B_Tree::bulkload2(void *_ds, int _n)
 			actNd = NULL;
 		}
 
-		lastStartBlock = startBlock; 
+		lastStartBlock = startBlock;
 		lastEndBlock = endBlock;
 
 		currentLevel++;
 	}
 
-	root = lastStartBlock; 
+	root = lastStartBlock;
 
 recycle:
 
@@ -698,7 +698,7 @@ recycle:
 
 /*****************************************************************
 builds a tree from a data file.
-record format: 
+record format:
 			id key_1 key_2 ... key_keysize
 
 para:
@@ -711,7 +711,7 @@ void B_Tree::build_from_file(char *_dsname)
 {
     B_Entry *d;
     FILE *fp;
-    
+
 	int record_count = 0;
 
     if((fp = fopen(_dsname,"r")) == NULL)
@@ -722,7 +722,7 @@ void B_Tree::build_from_file(char *_dsname)
     else
     {
 		int id = 0;
-		float info[10]; 
+		float info[10];
 
 		while (!feof(fp))
 		{
@@ -745,7 +745,7 @@ debug_info[0] = 0;
 
 		d = new_one_entry();
 		d->init(this, 0);
-				
+
 		fread_next_entry(fp, d);
 
 //d->key = 1000;
@@ -763,9 +763,9 @@ debug_info[0] = 0;
       }
     }
 
-	fclose(fp); 
+	fclose(fp);
 	printf("\n");
-	
+
 	delroot();
 }
 
@@ -780,14 +780,14 @@ void B_Tree::fread_next_entry(FILE *_fp, B_Entry *_d)
 	fscanf(_fp, "%d ", &(_d->son));
 	for (int i = 0; i < keysize; i ++)
 		fscanf(_fp, "%d", &(_d->key[i]));
-	
+
 	fscanf(_fp, "\n");
 
 	_d->leafson = _d->son;
 }
 
 /*****************************************************************
-This function adds an extension ".b" to the file name 
+This function adds an extension ".b" to the file name
 
 Parameters:
 - _fname: the file name before adding the extension
@@ -806,7 +806,7 @@ creates a new tree
 Parameters:
 - fname: the file name before adding the extension
 - blength: page size
-- c: 
+- c:
 - keysize:
 
 Coded by Yufei Tao, 31 July 08
@@ -824,7 +824,7 @@ void B_Tree::init(char *_fname, int _b_length, Cache *_c, int _keysize)
 		fclose(fp);
 		printf("The file \"%s\" exists. Replace? (y/n)", fname);
 		char c = getchar(); getchar();
-		if (c != 'y' && c != 'Y') 
+		if (c != 'y' && c != 'Y')
 			error("", true);
 		remove(fname);
 	}
@@ -856,7 +856,7 @@ Traverse the tree and collect information.
 PARAMETERS:
 - _info (out): carries the collected info outside the function.
                Currently, _info[0] is the number of objects in the tree, _info[1] the number of nodes, and
-			   _info[2] the node capacity. 
+			   _info[2] the node capacity.
 
 RETURN
 1 -- Everything all right.

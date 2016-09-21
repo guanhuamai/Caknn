@@ -28,12 +28,12 @@ public:
    uses *fuf_cont; 		//indicator array that shows whether one cache block is free, used or fixed
    int  *LRU_indicator; //indicator that shows how old (unused) is a page in the cache
    bool *dirty_indicator;  //indicator that shows if a cache page has been written
-	   
+
    char **cache;   		// Cache
 
 	//=====================================================
-   
-   int next();		
+
+   int next();
 
    int in_cache(int index, Cacheable *rt);
 
@@ -53,7 +53,7 @@ public:
 
    void set_cachesize(int s);
 
-   void flush();			
+   void flush();
 };
 
 

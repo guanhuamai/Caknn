@@ -50,7 +50,7 @@ void ExtSort::init(int _n, char *_src_fname, char *_tar_fname)
 	working_folder = new char[len + 1];
 	strcpy(working_folder, _tar_fname);
 
-	int pos = -1; 
+	int pos = -1;
 	for (int i = len - 1; i >= 0; i --)
 		if (working_folder[i] == '/')
 		{
@@ -61,7 +61,7 @@ void ExtSort::init(int _n, char *_src_fname, char *_tar_fname)
 }
 
 /*****************************************************************
-this is an auxiliary function needed by esort. it returns the file 
+this is an auxiliary function needed by esort. it returns the file
 name of a given run
 
 para:
@@ -76,7 +76,7 @@ void ExtSort::get_run_fname(int _step, int _run, char *_fname)
 {
 	char *step_name = new char[100];
 	char *run_name = new char[100];
-	
+
 	itoa(_step, step_name, 10);
 	itoa(_run, run_name, 10);
 	strcpy(_fname, working_folder);
@@ -235,7 +235,7 @@ if (prev_he)
 }
 
 /*****************************************************************
-reads an element from the file. 
+reads an element from the file.
 
 para:
 
@@ -247,7 +247,7 @@ Coded by Yufei Tao, 4 aug 08
 
 bool exExtSort::read_elem(FILE *_fp, void *_elem)
 {
-	bool ret = true; 
+	bool ret = true;
 	float *v = (float *) _elem;
 
 	if (!feof(_fp))
@@ -261,14 +261,14 @@ bool exExtSort::read_elem(FILE *_fp, void *_elem)
 
 		fscanf(_fp, "\n");
 	}
-	else 
+	else
 		ret = false;
 
 	return ret;
 }
 
 /*****************************************************************
-write an element to a file. 
+write an element to a file.
 
 para:
 
@@ -340,7 +340,7 @@ Coded by Yufei Tao, 4 aug 08
 int ExtSort::get_initial_runs()
 {
 	FILE * src_fp = fopen(src_fname, "r");
-			
+
 	char fname[100];
 	voidptr *mem = new voidptr[n];
 	for (int i = 0; i < n; i ++)
@@ -357,7 +357,7 @@ int ExtSort::get_initial_runs()
 			read_elem(src_fp, mem[r_cnt]);
 			r_cnt++;
 		}
-		
+
 		if (r_cnt == n || feof(src_fp))
 		{
 			//sort the last batch of objects read
@@ -371,11 +371,11 @@ int ExtSort::get_initial_runs()
 				printf("failed to create %s\n", fname);
 				exit(1);
 			}
-	
+
 			for (i = 0; i < r_cnt; i ++)
 			{
 				write_elem(ofp, mem[i]);
-			}	
+			}
 			fclose(ofp);
 
 			run ++;
@@ -398,7 +398,7 @@ int ExtSort::get_initial_runs()
 }
 
 /*****************************************************************
-external sort 
+external sort
 
 para:
 
@@ -457,21 +457,21 @@ int ExtSortBinHeap::compare(const void *_e1, const void *_e2)
 }
 
 /*****************************************************************
-prints an err msg 
+prints an err msg
 
 para:
-- msg: 
+- msg:
 - exit: true if you want to exit the program
 
 Coded by Yufei Tao, 4 aug 08
 *****************************************************************/
 
 void error(char *_msg, bool _exit)
-{ 
-	printf(_msg); 
+{
+	printf(_msg);
 
-	if (_exit) 
-		exit(1); 
+	if (_exit)
+		exit(1);
 }
 
 /*****************************************************************
@@ -491,7 +491,7 @@ Coded by Yufei Tao, 31 july 08
 
 int compfloats(float _v1, float _v2)
 {
-	int ret = 0; 
+	int ret = 0;
 
 	if (_v1 - _v2 < -FLOATZERO)
 		ret = -1;
@@ -528,7 +528,7 @@ get the part of a path after the last blackslash.
 e.g., given path = "./ex/ex/ex.h", return "ex.h"
 
 para
-- path:			the given path. 
+- path:			the given path.
 - (out) fname:	the returned part (usually a file name)
 
 Coded by Yufei Tao, 4 aug 08
@@ -565,7 +565,7 @@ e.g, given ./ex/ex/1.zip, the function returns ./ex/ex/
 
 para:
 - path
-- (out) folder: 
+- (out) folder:
 
 Coded by Yufei Tao, 7 aug 08
 *****************************************************************/
@@ -579,7 +579,7 @@ void get_leading_folder(char *_path, char *_folder)
 	{
 		if (_path[i] == '/')
 		{
-			pos = i; 
+			pos = i;
 			break;
 		}
 	}
@@ -635,7 +635,7 @@ _w (out):			the word returned.
 
 
 RETURN:
-the character. 
+the character.
 
 KNOWN ISSUES:
 None.
@@ -673,7 +673,7 @@ _s (in/out):		the string. when the function finishes, _s
 					returned.
 
 RETURN:
-the character. 
+the character.
 
 KNOWN ISSUES:
 None.
@@ -705,9 +705,9 @@ print the last m bits of an integer n
 
 -para-
 n
-m		
+m
 
--by- 
+-by-
 yf tao
 
 -last touch-
@@ -722,7 +722,7 @@ void printINT_in_BIN(int _n, int _m)
 
 	mask = 1 << _m;
 	mask --;
-	
+
 	n = _n & mask;
 
 	mask = 1 << (_m - 1);

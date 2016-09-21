@@ -9,7 +9,7 @@
 //-----------------------------------------------
 //does the same thing as "fopen", but displays an error message if failed
 
-//fname: 
+//fname:
 //c: 'r' for reading, and 'w' for writing
 
 FILE *openfile(char *_fname, char _c)

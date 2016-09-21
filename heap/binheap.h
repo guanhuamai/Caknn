@@ -6,9 +6,9 @@ class BinHeapEntry
 public:
 	int leftcnt;										//how many nodes in total in the left subtree
 	int rightcnt;										//in the right
-	BinHeapEntry *leftchild;								
-	BinHeapEntry *rightchild;	
-	BinHeapEntry *parent;	
+	BinHeapEntry *leftchild;
+	BinHeapEntry *rightchild;
+	BinHeapEntry *parent;
 	void *data;
 
 	//-----functions-----
@@ -24,7 +24,7 @@ typedef BinHeapEntry * BinHeapEntryptr;
 class BinHeap
 {
 public:
-	
+
 	BinHeapEntry *root;
 	int (*compare_func)(const void *_e1, const void *_e2);
 	void (*destroy_data)(const void *_e);

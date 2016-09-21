@@ -45,14 +45,14 @@ BinHeapEntry::~BinHeapEntry()
 }
 
 /*****************************************************************
-this function puts the new entry at the next position of the lowest 
+this function puts the new entry at the next position of the lowest
 level. first, if currently the binary tree is a perfect tree, put the
-entry as the left child of the leftmost leaf. otherwise, put the 
-entry as the left (or right if left exists) child of the leftmost 
+entry as the left child of the leftmost leaf. otherwise, put the
+entry as the left (or right if left exists) child of the leftmost
 node at the last-but-one-level node that doesn't have two children.
 
 para:
-- new_e: 
+- new_e:
 
 return:
 - the final parent of new_e
@@ -121,7 +121,7 @@ BinHeapEntry * BinHeapEntry::crude_delete()
 	}
 	else if (rightcnt == 0)
 	{
-		ret = leftchild; 
+		ret = leftchild;
 		leftcnt --;
 	}
 	else if (leftcnt == rightcnt)
@@ -136,7 +136,7 @@ BinHeapEntry * BinHeapEntry::crude_delete()
 				rightcnt --;
 				ret = rightchild->crude_delete();
 			}
-			else 
+			else
 			{
 				leftcnt --;
 				ret = leftchild->crude_delete();
@@ -217,7 +217,7 @@ Coded by Yufei Tao, 4 aug 08
 
 BinHeapEntry * BinHeap::remove()
 {
-	BinHeapEntry *ret; 
+	BinHeapEntry *ret;
 
 	if (!root)
 	{
@@ -245,7 +245,7 @@ BinHeapEntry * BinHeap::remove()
 }
 
 /*****************************************************************
-this function fixes the data field to satisfy the heap property. 
+this function fixes the data field to satisfy the heap property.
 start from a leaf and go upward
 
 Coded by Yufei Tao, 4 aug 08
@@ -258,7 +258,7 @@ void BinHeap::adjust_upward(BinHeapEntry *_he)
 	while (he->parent)
 	{
 		int rslt = compare(he->parent->data, he->data);
-		
+
 		if (rslt == 1)
 		{
 			swap_data(he, he->parent);
@@ -275,7 +275,7 @@ swap the data fields of two entries
 para:
 - e1:
 - e2
-  
+
 Coded by Yufei Tao, 4 aug 08
 *****************************************************************/
 
@@ -288,7 +288,7 @@ void BinHeap::swap_data(BinHeapEntry *_e1, BinHeapEntry *_e2)
 }
 
 /*****************************************************************
-this function fixes the data field to satisfy the heap property. 
+this function fixes the data field to satisfy the heap property.
 start from the root and go downward
 
 Coded by Yufei Tao, 4 aug 08
@@ -337,7 +337,7 @@ void BinHeap::adjust_downward()
 }
 
 /*****************************************************************
-this function fixes the data field to satisfy the heap property. 
+this function fixes the data field to satisfy the heap property.
 start from the root and go downward
 
 Coded by Yufei Tao, 4 aug 08
