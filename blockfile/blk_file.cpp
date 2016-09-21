@@ -11,8 +11,8 @@ store header info.  data info is stored starting from the 2nd block.  both types
 of # start from 0.
 2) "actblock" is internal block #.  "number" is the # of data block (i.e. excluding
 the header block).  maximum actblock equals to number.  maximum external block #
-equals to number - 1 
-3) cache_cont records the internal numbers. 
+equals to number - 1
+3) cache_cont records the internal numbers.
 */
 
 #include <string.h>
@@ -22,6 +22,7 @@ equals to number - 1
 
 void BlockFile::fwrite_number(int value)
 {
+
    put_bytes((char *) &value, sizeof(int));
 }
 
@@ -77,7 +78,7 @@ BlockFile::BlockFile(char* name,int b_length)
    }
 
    fseek(fp,0,SEEK_SET);
-   act_block=0;			
+   act_block=0;
 }
 
 //----------------------------------------------------------------
@@ -148,7 +149,7 @@ bool BlockFile::read_block(Block b,int pos)
 //----------------------------------------------------------------
 
 bool BlockFile::write_block(Block block, int pos)
-  //note that this function can only write to an already allocated block.  to 
+  //note that this function can only write to an already allocated block.  to
   //allocate a new block, use append_block instead.
 {
    pos++;      //external # to interal #
@@ -228,7 +229,7 @@ int CachedBlockFile::next()
 		 {
 		        // select a victim page to be written back to disk
              int lru_index = 0; // the index of the victim page
-             
+
 			 for (int i = 1; i < cachesize; i++)
                 if (LRU_indicator[i] > LRU_indicator[lru_index])
                     lru_index=i;        /*the replacement policy is least recently used.  pick
@@ -296,7 +297,7 @@ CachedBlockFile::CachedBlockFile(char* name,int blength, int csize)
 
 	for (i=0; i<cachesize; i++)
 	{
-		cache_cont[i] = 0;  
+		cache_cont[i] = 0;
 		fuf_cont[i]=free;
 		LRU_indicator[i] = 0;
 		dirty_indicator[i] = false;
@@ -338,7 +339,7 @@ bool CachedBlockFile::read_block(Block block, int index)
 		if((c_ind = in_cache(index)) >= 0) // get cached?
 			memcpy(block, cache[c_ind], get_blocklength());
 		else
-		{     
+		{
 			  //adding line
 			page_faults ++;
 			  //line added by tao yufei
@@ -356,7 +357,7 @@ bool CachedBlockFile::read_block(Block block, int index)
 		}
 		return TRUE;
 	}
-	else 
+	else
 	{
 		printf("The requested block %d is illegal", index - 1);  error("\n", true);
 		return FALSE;  //adding this line is just to avoid the warning "not all the
@@ -379,7 +380,7 @@ bool CachedBlockFile::write_block(Block block, int index)
 			memcpy(cache[c_ind], block, get_blocklength());
 			dirty_indicator[c_ind] = true;
 		}
-		else		
+		else
 		{
 			c_ind = next();
 			if (c_ind >= 0)
@@ -405,7 +406,7 @@ bool CachedBlockFile::write_block(Block block, int index)
 //----------------------------------------------------------------
 
 bool CachedBlockFile::fix_block(int index)
-  //call the function to pin a certain block in the memory.  
+  //call the function to pin a certain block in the memory.
 {
 	int c_ind;
 
@@ -413,14 +414,14 @@ bool CachedBlockFile::fix_block(int index)
 
 	if (index <= get_num_of_blocks() && index > 0)
 	{
-		if((c_ind = in_cache(index)) >= 0) 	
+		if((c_ind = in_cache(index)) >= 0)
 		{
 			return TRUE;
 			fuf_cont[c_ind] = fixed;
 		}
 		/*
-		else		
-			if((c_ind = next()) >= 0)	
+		else
+			if((c_ind = next()) >= 0)
 			{
 				BlockFile::read_block(cache[c_ind], index-1); // ext.Num.
 				cache_cont[c_ind]=index;
@@ -437,7 +438,7 @@ bool CachedBlockFile::fix_block(int index)
 	else
 	{
 		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
-    }		
+    }
 
 	return false;
 }
@@ -505,7 +506,7 @@ void CachedBlockFile::set_cachesize(int size)
 
 		for (i=0; i<cachesize; i++)
 		{
-			cache_cont[i] = 0;  
+			cache_cont[i] = 0;
 			fuf_cont[i]=free;
 			LRU_indicator[i] = 0;
 			dirty_indicator[i] = false;
@@ -527,7 +528,7 @@ void CachedBlockFile::flush()
 	int i;
 
 	for (i = 0; i < cachesize; i++)
-		if (fuf_cont[i] != free && dirty_indicator[i])	
+		if (fuf_cont[i] != free && dirty_indicator[i])
 			BlockFile::write_block(cache[i], cache_cont[i] - 1); // ext.Num.
 }
 
