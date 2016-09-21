@@ -1,0 +1,195 @@
+# depslib dependency file v1.0
+1467253032 source:/home/mgh/bplustree/BPlusTree.cpp
+	<iostream>
+	<fstream>
+	<string>
+	"BPlusTree.hpp"
+	"Exceptions.hpp"
+	"InternalNode.hpp"
+	"LeafNode.hpp"
+	"Node.hpp"
+
+1467175015 /home/mgh/bplustree/BPlusTree.hpp
+	<tuple>
+	<vector>
+	"Definitions.hpp"
+	"Printer.hpp"
+
+1467253456 /home/mgh/bplustree/Definitions.hpp
+	<cstdlib>
+
+1467175228 /home/mgh/bplustree/Printer.hpp
+	<queue>
+
+1467176314 /home/mgh/bplustree/Exceptions.hpp
+	<exception>
+	<string>
+	"Definitions.hpp"
+
+1467176002 /home/mgh/bplustree/InternalNode.hpp
+	<queue>
+	<vector>
+	"Definitions.hpp"
+	"Node.hpp"
+
+1467175554 /home/mgh/bplustree/Node.hpp
+	<string>
+	"Definitions.hpp"
+
+1467253400 /home/mgh/bplustree/LeafNode.hpp
+	<tuple>
+	<utility>
+	<vector>
+	"Node.hpp"
+	"Record.hpp"
+
+1467175416 /home/mgh/bplustree/Record.hpp
+	"Definitions.hpp"
+
+1467176364 source:/home/mgh/bplustree/Exceptions.cpp
+	<sstream>
+	<string>
+	"Exceptions.hpp"
+	"Node.hpp"
+
+1467176002 source:/home/mgh/bplustree/InternalNode.cpp
+	<iostream>
+	<sstream>
+	"Exceptions.hpp"
+	"InternalNode.hpp"
+
+1467176082 source:/home/mgh/bplustree/LeafNode.cpp
+	<sstream>
+	"Exceptions.hpp"
+	"InternalNode.hpp"
+	"LeafNode.hpp"
+
+1467177096 source:/home/mgh/bplustree/main.cpp
+	<iostream>
+	<sstream>
+	"BPlusTree.hpp"
+	"Definitions.hpp"
+
+1467175512 source:/home/mgh/bplustree/Node.cpp
+	"Node.hpp"
+
+1467175249 source:/home/mgh/bplustree/Printer.cpp
+	<iostream>
+	"InternalNode.hpp"
+	"LeafNode.hpp"
+	"Node.hpp"
+	"Printer.hpp"
+
+1467175435 source:/home/mgh/bplustree/Record.cpp
+	<string>
+	<sstream>
+	"Definitions.hpp"
+	"Record.hpp"
+
+1250775892 source:/home/mgh/bplustree/lsb/btree/b-entry.cpp
+	<stdio.h>
+	<memory.h>
+	"b-node.h"
+	"b-entry.h"
+	"b-tree.h"
+	"b-def.h"
+	"../gadget/gadget.h"
+
+1218126602 /home/mgh/bplustree/lsb/btree/b-node.h
+	"b-def.h"
+
+1217933448 /home/mgh/bplustree/lsb/btree/b-def.h
+	<stdlib.h>
+	<stdio.h>
+
+1225450364 /home/mgh/bplustree/lsb/btree/b-entry.h
+
+1250776340 /home/mgh/bplustree/lsb/btree/b-tree.h
+	"b-def.h"
+	"../blockfile/cache.h"
+
+982684800 /home/mgh/bplustree/lsb/blockfile/cache.h
+	"f_def.h"
+
+1217950950 /home/mgh/bplustree/lsb/blockfile/f_def.h
+	<stdio.h>
+
+1250698888 /home/mgh/bplustree/lsb/gadget/gadget.h
+	<stdio.h>
+	"../heap/binheap.h"
+
+1218124794 /home/mgh/bplustree/lsb/heap/binheap.h
+
+1474378157 source:/home/mgh/bplustree/lsb/btree/b-node.cpp
+	<math.h>
+	<memory.h>
+	"b-node.h"
+	"b-entry.h"
+	"b-tree.h"
+	"b-def.h"
+	"../blockfile/blk_file.h"
+	"../blockfile/cache.h"
+	"../gadget/gadget.h"
+
+1217593092 /home/mgh/bplustree/lsb/blockfile/blk_file.h
+	<stdio.h>
+	"f_def.h"
+
+1474378364 source:/home/mgh/bplustree/lsb/btree/b-tree.cpp
+	<math.h>
+	<stdio.h>
+	<string.h>
+	<memory.h>
+	<iostream>
+	"b-tree.h"
+	"b-node.h"
+	"b-entry.h"
+	"b-def.h"
+	"../heap/heap.h"
+	"../blockfile/blk_file.h"
+	"../gadget/gadget.h"
+
+1218136666 /home/mgh/bplustree/lsb/heap/heap.h
+
+1474379189 source:/home/mgh/bplustree/lsb/gadget/gadget.cpp
+	"gadget.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<string>
+	"../heap/binheap.h"
+
+1218138696 source:/home/mgh/bplustree/lsb/heap/binheap.cpp
+	"binheap.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<memory.h>
+	"../gadget/gadget.h"
+
+1217949362 source:/home/mgh/bplustree/lsb/heap/heap.cpp
+	"heap.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<memory.h>
+
+1218134308 source:/home/mgh/bplustree/lsb/blockfile/blk_file.cpp
+	<string.h>
+	"blk_file.h"
+	"../gadget/gadget.h"
+
+1217950924 source:/home/mgh/bplustree/lsb/blockfile/cache.cpp
+	<string.h>
+	"cache.h"
+	"blk_file.h"
+	"../gadget/gadget.h"
+
+1217950932 source:/home/mgh/bplustree/lsb/blockfile/f_def.cpp
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	"f_def.h"
+	"../gadget/gadget.h"
+
