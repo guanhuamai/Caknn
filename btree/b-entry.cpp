@@ -58,7 +58,7 @@ B_Entry::~B_Entry()
 
 //-----------------------------------------------
 
-int B_Entry::get_size(int _level)
+int B_Entry::get_size(int _level)//leaf entry and internal entry size is different
 {
 	int size;
 

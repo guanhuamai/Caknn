@@ -11,8 +11,8 @@
 
 //-----------------------------------------------
 
-enum BINSRT {B_NRML, B_OVRFLW};
-enum BDEL {B_NONE, B_UNDRFLW, B_NOTFOUND};
+enum BINSRT {B_NRML, B_OVRFLW};//.b tree insert status
+enum BDEL {B_NONE, B_UNDRFLW, B_NOTFOUND};// delete entry status
 
 //-----------------------------------------------
 

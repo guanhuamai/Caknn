@@ -1,6 +1,7 @@
 #ifndef __GADGET_H
 #define __GADGET_H
 
+#include <string>
 #include <stdio.h>
 #include "../heap/binheap.h"
 
@@ -20,7 +21,7 @@ typedef void * voidptr;
 
 void	blank_print			(int _n);
 int		compfloats			(float _v1, float _v2);
-void	error				(char *_msg, bool _exit);
+void	error				(const std::string _msg, bool _exit);
 void	get_leading_folder	(char *_path, char *_folder);
 void	getFNameFromPath	(char *_path, char *_fname);
 char	getnextChar			(char **_s);
