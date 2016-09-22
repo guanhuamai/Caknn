@@ -4,8 +4,6 @@
 #define __DistMatrix
 
 
-
-
 class DataCache
 {
 
@@ -31,14 +29,16 @@ protected:
 //this operation is to regulate cache in memory
 
 public:
-    int getBlockLength();
-    void InitCache(int csize, int blength);
-    void RefreshCache();
-    void DestroyCache();
-    bool getCacheBlock(char* buffer,int BlockId);
-    void storeCacheBlock(char* buffer,int BlockId);	// user's responsibility
-    void printPageAccess();//show the statistics
-    void RefreshStat();// make statistics zero
+    DataCache(int csize, int blocklen);
+    virtual ~DataCache();
+    virtual void InitCache(int csize, int blength);
+    virtual int getBlockLength();
+    virtual void RefreshCache();
+    virtual void DestroyCache();
+    virtual bool getCacheBlock(char* buffer,int BlockId);
+    virtual void storeCacheBlock(char* buffer,int BlockId);	// user's responsibility
+    virtual void printPageAccess();//show the statistics
+    virtual void RefreshStat();// make statistics zero
 };
 
 
@@ -47,11 +47,11 @@ class DistMatrix
 
 protected:
     FILE* fp;//file pointer
-    char* fnamePrefix;//file name prefix
+    char* filePrefix;//file name prefix
 
 
     int blocklength;
-    DataCache* cc;
+    DataCache* dc;
     B_Tree* bt;
 
 
@@ -60,7 +60,9 @@ protected:
 
 public:
 
-    virtual void initDsk(int csize, int blength, char* filePrefix);
+    DistMatrix(int csize, int blength, char* filePrefix);
+    virtual ~DistMatrix();
+    virtual void initDsk(int csize, int blength);//init local cache, btree, btree cache and matrix
     virtual size_t writeDist(int snid, int enid, double dist);
     virtual double readDist(int snid, int enid);
 

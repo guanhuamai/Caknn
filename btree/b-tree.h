@@ -15,11 +15,11 @@ class B_Tree : public Cacheable
 {
 public:
 	//--==write to disk==--
-	int root;
+	int root;                                                       //live in memory
 	int keysize;													//size of the key array of each entry
 
 	//--== others ==--
-	B_Node *root_ptr;
+	B_Node *root_ptr;                                               //not live in memory
 
 	//--=== for debugging ===--
 	int last_leaf;

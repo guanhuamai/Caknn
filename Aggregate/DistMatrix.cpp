@@ -4,7 +4,18 @@
 #include "DistMatrix.h"
 
 
+DataCache::DataCache(int csize, int blocklen){
+    this->InitCache(csize, blocklen);
+}
 
+DataCache::~DataCache(){
+    for(int i = 0; i < cachesize; i++){
+        delete []cache[i];
+    }
+    delete[] cache;
+    delete[] cache_block;
+    delete[] lastTime;
+}
 
 int DataCache::getBlockLength() {
 	return blocklength;
@@ -97,9 +108,36 @@ void DataCache::printPageAccess() {
 
 
 
-void MatrixDsk::initMatrixDsk(int csize, int blength, char* filePrefix);
+DistMatrix::DistMatrix(int csize, int blength, char* filePrefix){
 
-int* MatrixDsk::hashBTkey(int snid, int enid){
+    this->filePrefix = new char[100];
+    strcpy(this->filePrefix, filePrefix);
+    this->initDsk(csize, blength);
+
+}
+
+DistMatrix::~DistMatrix(){
+    fclose(this->fp);
+    delete[] this->filePrefix;
+    delete this->dc;
+    delete this->bt;
+}
+
+void DistMatrix::initDsk(int csize, int blength){
+    Cache* c = new Cache(csize, blength);
+    bt = new B_Tree();
+    bt->init(filePrefix, blength, c, 2);
+
+    this->dc = new DataCache(csize, blength);
+
+    char *matrixname = new char[100];
+    strcpy(matrixname, filePrefix);
+    strcat(matrixname, ".m");
+    fp = fopen(matrixname, "wb+");
+    delete[] matrixname;
+}
+
+int* DistMatrix::hashBTkey(int snid, int enid){
         int * key = new int[2];
         if (snid > enid){
             int tmp = snid;
@@ -110,7 +148,7 @@ int* MatrixDsk::hashBTkey(int snid, int enid){
         return key;
     }
 
-size_t MatrixDsk::findAddrByBT(int snid, int enid){
+size_t DistMatrix::findAddrByBT(int snid, int enid){
     int* key = hashBTkey(snid, enid);
     size_t position = bt->findValueByKey(key, bt->root_ptr);
 
@@ -118,7 +156,7 @@ size_t MatrixDsk::findAddrByBT(int snid, int enid){
     return position;
 }
 
-size_t MatrixDsk::writeDist(int snid, int enid, double dist){
+size_t DistMatrix::writeDist(int snid, int enid, double dist){
     size_t position = ftell(fp);
     fwrite(&snid, sizeof(int), 1, fp);
     fwrite(&enid, sizeof(int), 1, fp);
@@ -126,23 +164,28 @@ size_t MatrixDsk::writeDist(int snid, int enid, double dist){
 
     int* key = hashBTkey(snid, enid);
 
+
     bt->insertKV(key, position);//no need to close it here, will be deleted at the bottom of the tree
+
 
     delete []key;
     return position;
 }
 
-double MatrixDsk::readDist(int snid, int enid){
+double DistMatrix::readDist(int snid, int enid){
     double dist = -1.0;
-    size_t addr = find_dist_addr(snid, enid);
 
-    int blk_len = cc->getBlockLength();
+    bt->load_root();
+    size_t addr = this->findAddrByBT(snid, enid);
+    bt->delroot();
+
+    int blk_len = dc->getBlockLength();
     int blk_id = (int)addr / blk_len;
     char* buf = new char[blk_len];
-    if (!cc->getCacheBlock(buf, blk_id)){
+    if (!dc->getCacheBlock(buf, blk_id)){
         fseek(fp, blk_id * blk_len, SEEK_SET);
         fread(buf, blk_len, 1, fp);
-        cc->storeCacheBlock(buf, blk_id);
+        dc->storeCacheBlock(buf, blk_id);
         fseek(fp, 0, SEEK_END);
     }
     memcpy(&dist, &buf[addr % blk_len], sizeof(double));
