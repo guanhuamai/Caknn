@@ -76,7 +76,10 @@ bool DataCache::getCacheBlock(char* buffer,int BlockId) {
 // the place for counting number of page accesses
 void DataCache::storeCacheBlock(char* buffer, int BlockId) {
 	int index=-1;
-	for (int i=0;i<cachesize;i++)	// search for empty block
+	for (int i=0;i<cachesize;i++)	// search for exist block
+		if (cache_block[i] == BlockId && lastTime[i] >= 0) {index=i;	break;}
+
+	for (int i=0;i<cachesize && index == -1;i++)	// search for empty block
 		if (lastTime[i]<0) {index=i;	break;}
 
 	if (index<0) {
@@ -153,32 +156,42 @@ int* DistMatrix::hashBTkey(int snid, int enid){
 
 size_t DistMatrix::findAddrByBT(int snid, int enid){
     int* key = hashBTkey(snid, enid);
-    size_t position = bt->findValueByKey(key, bt->root_ptr);
+    size_t addr = bt->findValueByKey(key, bt->root_ptr);
 
     delete []key;
-    return position;
+    return addr;
 }
 
 size_t DistMatrix::writeDist(int snid, int enid, double dist){
-    size_t position = ftell(fp);
-    size_t fil_len = blocklength - (position % blocklength);//fill the gap inside blocks which cannot store the whole tuple
+    size_t addr = ftell(fp);
+    size_t fil_len = blocklength - (addr % blocklength);//fill the gap inside blocks which cannot store the whole tuple
     if(fil_len < 2 * sizeof(int) + sizeof(double)){
         char fil = '0';
         fwrite(&fil, sizeof(char), fil_len, fp);
-        position = ftell(fp);
+        addr = ftell(fp);
     }
     fwrite(&snid, sizeof(int), 1, fp);
     fwrite(&enid, sizeof(int), 1, fp);
     fwrite(&dist, sizeof(double), 1, fp);
 
+
+//update the memory cache
+    int blk_len = dc->getBlockLength();
+    int blk_id = (int)addr / blk_len;
+    char* buf = new char[blk_len];
+    fseek(fp, blk_id * blk_len, SEEK_SET);
+    fread(buf, blk_len, 1, fp);
+    fseek(fp, 0, SEEK_END);
+    dc->storeCacheBlock(buf, blk_id);
+    delete []buf;
+
+
     int* key = hashBTkey(snid, enid);
-
-
-    bt->insertKV(key, position);//no need to close it here, will be deleted at the bottom of the tree
-
-
+    bt->insertKV(key, addr);//no need to close it here, will be deleted at the bottom of the tree
     delete []key;
-    return position;
+
+
+    return addr;
 }
 
 double DistMatrix::readDist(int snid, int enid){
