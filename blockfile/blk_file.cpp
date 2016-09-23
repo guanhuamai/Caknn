@@ -87,6 +87,8 @@ BlockFile::~BlockFile()
 {
    delete[] filename;
    fclose(fp);
+   filename = NULL;
+   fp = NULL;
 }
 
 //----------------------------------------------------------------
