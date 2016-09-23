@@ -940,13 +940,14 @@ size_t B_Tree::findValueByKey(int* key, B_Node* node){//find key from root to th
 	if (node->is_eq_key_pos(key, follow))
 	{
 		ret = node->entries[follow]->addr;
+		return ret;
 	}
 
 	if (follow != -1 && node->level != 0)
 	{
 		B_Node *succ = node->entries[follow]->get_son();
 		ret = findValueByKey(key, succ);
-		delete succ;
+		//delete succ;
 		node->entries[follow]->del_son();
 	}
 

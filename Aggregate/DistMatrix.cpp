@@ -110,9 +110,11 @@ void DataCache::printPageAccess() {
 
 DistMatrix::DistMatrix(int csize, int blength, char* filePrefix){
 
+    this->blocklength = blength;
     this->filePrefix = new char[100];
     strcpy(this->filePrefix, filePrefix);
     this->initDsk(csize, blength);
+
 
 }
 
@@ -159,6 +161,12 @@ size_t DistMatrix::findAddrByBT(int snid, int enid){
 
 size_t DistMatrix::writeDist(int snid, int enid, double dist){
     size_t position = ftell(fp);
+    size_t fil_len = blocklength - (position % blocklength);//fill the gap inside blocks which cannot store the whole tuple
+    if(fil_len < 2 * sizeof(int) + sizeof(double)){
+        char fil = '0';
+        fwrite(&fil, sizeof(char), fil_len, fp);
+        position = ftell(fp);
+    }
     fwrite(&snid, sizeof(int), 1, fp);
     fwrite(&enid, sizeof(int), 1, fp);
     fwrite(&dist, sizeof(double), 1, fp);
@@ -179,9 +187,9 @@ double DistMatrix::readDist(int snid, int enid){
     size_t addr = this->findAddrByBT(snid, enid);
     bt->delroot();
 
-    //float* info = new float[3];
-    //bt->traverse(info);
-
+//    float* info = new float[3];
+//    bt->traverse(info);
+//
 //    for (int i = 0; i < 3; i++){
 //        printf("%f %f %f", info[0], info[1], info[2]);
 //    }
