@@ -131,7 +131,7 @@ B_Node::~B_Node()
 
 	if (entries)
 	{
-		for (int i = 0; i < num_entries; i ++)
+		for (int i = 0; i < capacity; i ++)
 		{
 			entries[i]->close();
 			delete entries[i];

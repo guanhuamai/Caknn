@@ -113,7 +113,6 @@ DistMatrix::DistMatrix(int csize, int blength, char* filePrefix){
     this->filePrefix = new char[100];
     strcpy(this->filePrefix, filePrefix);
     this->initDsk(csize, blength);
-    delete[] filePrefix;
 
 }
 
