@@ -13,6 +13,7 @@
 B_Entry::B_Entry()
 
 {
+    addr = -1;
 	son = -1;
 	key = NULL;
 	son_ptr = NULL;
@@ -63,9 +64,9 @@ int B_Entry::get_size(int _level)//leaf entry and internal entry size is differe
 	int size;
 
 	if (_level == 0)
-		size = sizeof(key) + sizeof(son) + sizeof(float) * my_tree->keysize;
+		size = sizeof(key) + sizeof(son) + sizeof(int) * my_tree->keysize + sizeof(addr);
 	else
-		size = sizeof(key) + sizeof(son) + sizeof(leafson) + sizeof(float) * my_tree->keysize;
+		size = sizeof(key) + sizeof(son) + sizeof(leafson) + sizeof(int) * my_tree->keysize + sizeof(addr);
 
 	return size;
 }
@@ -98,8 +99,8 @@ void B_Entry::del_son()
 int B_Entry::read_from_buffer(char *_buf)
 {
 	int i;
-	memcpy(key, _buf, my_tree->keysize * sizeof(float));
-	i = my_tree->keysize * sizeof(float);
+	memcpy(key, _buf, my_tree->keysize * sizeof(int));
+	i = my_tree->keysize * sizeof(int);
 
 	memcpy(&son, &_buf[i], sizeof(son));
 	i += sizeof(son);
@@ -111,6 +112,9 @@ int B_Entry::read_from_buffer(char *_buf)
 	}
 	else
 		leafson = son;
+
+    memcpy(&addr, &_buf[i], sizeof(addr));
+    i += sizeof(addr);
 
 	return i;
 }
@@ -141,6 +145,8 @@ int B_Entry::write_to_buffer(char *_buf)
 		i += sizeof(leafson);
 	}
 
+	memcpy(&_buf[i], &addr, sizeof(addr));
+
 	return i;
 }
 
@@ -151,9 +157,10 @@ void B_Entry::set_from(B_Entry *_e)
 	if (level != _e->level)
 		error("Error in B_Entry::set_from -- different levels",	true);
 
-	memcpy(key, _e->key, _e->my_tree->keysize * sizeof(float));
+	memcpy(key, _e->key, _e->my_tree->keysize * sizeof(int));
 	my_tree = _e->my_tree;
 	son = _e->son;
+	addr = _e->addr;
 	leafson = _e->leafson;
 	son_ptr = _e->son_ptr;
 }
@@ -204,6 +211,7 @@ void B_Entry::set_from_child(B_Node *_nd)
 	son = _nd->block;
 	memcpy(key, _nd->entries[0]->key, my_tree->keysize * sizeof(int));
 	leafson = _nd->entries[0]->leafson;
+	addr = _nd->entries[0]->addr;
 }
 
 /*****************************************************************

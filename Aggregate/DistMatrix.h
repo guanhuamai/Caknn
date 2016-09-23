@@ -54,7 +54,7 @@ protected:
     DataCache* dc;
     B_Tree* bt;
 
-
+    virtual void initDsk(int csize, int blength);//init local cache, btree, btree cache and matrix
     virtual int* hashBTkey(int snid, int enid);
     virtual size_t findAddrByBT(int snid, int enid);
 
@@ -62,7 +62,6 @@ public:
 
     DistMatrix(int csize, int blength, char* filePrefix);
     virtual ~DistMatrix();
-    virtual void initDsk(int csize, int blength);//init local cache, btree, btree cache and matrix
     virtual size_t writeDist(int snid, int enid, double dist);
     virtual double readDist(int snid, int enid);
 

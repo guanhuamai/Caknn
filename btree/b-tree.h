@@ -13,6 +13,11 @@ class Heap;
 
 class B_Tree : public Cacheable
 {
+
+protected:
+
+    int num;
+
 public:
 	//--==write to disk==--
 	int root;                                                       //live in memory

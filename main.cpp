@@ -5,17 +5,24 @@ using namespace std;
 
 int main()
 {
-    cout << "Hello world!" << endl;
 
+    DistMatrix* mt = new DistMatrix(500, 4096, "test");
 
-    DistMatrix* mt = new DistMatrix(100, 100, "test");
-
-    for (int i = 0; i < 100000; i++){
-        mt->writeDist(i, i + 1, i * 100.1);
+    for (int i = 0; i < 100; i++){
+        mt->writeDist(i + 5, i + 6, i + 100.1);
     }
 
-    delete mt;
+//    printf("success load in btree");
+//    for (int i = 0; i < 1000000; i++){
+//        double dist = mt->readDist(i + 5, i + 6);
+//        if(dist - (i + 100.1) > 0.00001 || dist - (i + 100.1) < -0.00001){
+//            printf("%lf\n", dist);
+//        }
+//
+//    }
 
+    delete mt;
+    cout << "success" << endl;
 
     return 0;
 }

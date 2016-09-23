@@ -23,6 +23,7 @@ Coded by Yufei Tao 30/12/01
 
 B_Tree::B_Tree()
 {
+    num = 0;
 	quiet = 8;
 
 	root_ptr = NULL;
@@ -89,8 +90,12 @@ void B_Tree::close()
     file -> set_header(header);
     delete [] header;
 
-	if (cache)
-      cache -> flush();
+	if (cache){
+        cache -> flush();
+        delete cache;
+        cache = NULL;
+	}
+
 
     if (file)
 	{
@@ -122,7 +127,8 @@ Coded by Yufei Tao 29/12/01
 
 void B_Tree::delroot()
 {
-	delete root_ptr; root_ptr=NULL;
+	delete root_ptr;
+    root_ptr=NULL;
 }
 
 //-----------------------------------------------
@@ -913,14 +919,15 @@ by guanhua mai,
 *****************************************************************/
 
 void B_Tree::insertKV(int* key, size_t valueAddr){
-
     B_Entry* et = this->new_one_entry();
     et->init(this, 0);
-    et->son = valueAddr;
+    et->son = num++;
+    et->addr = valueAddr;
     for(int i = 0; i < this->keysize; i++){
         et->key[i] = key[i];
     }
-    this->insert(et);//no need to close it here, will be deleted at the bottom of the tree
+    et->leafson = et->son;
+    this->insert(et);                       //no need to close it here, will be deleted at the bottom of the tree
 }
 
 
@@ -930,15 +937,16 @@ size_t B_Tree::findValueByKey(int* key, B_Node* node){//find key from root to th
 
     int follow = node->max_lesseq_key_pos(key);
 
-	if (node->level == 0 && node->is_eq_key_pos(key, follow))//leaf
+	if (node->is_eq_key_pos(key, follow))
 	{
-		ret = node->entries[follow]->son;
+		ret = node->entries[follow]->addr;
 	}
 
-	if (follow != -1)
+	if (follow != -1 && node->level != 0)
 	{
 		B_Node *succ = node->entries[follow]->get_son();
 		ret = findValueByKey(key, succ);
+		delete succ;
 		node->entries[follow]->del_son();
 	}
 

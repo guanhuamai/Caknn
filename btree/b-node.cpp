@@ -99,9 +99,10 @@ void B_Node::init(B_Tree *_B_Tree, int _block)
 	delete e;
 
 	capacity = (b_len - header_size) / entry_size;
+	//printf("capacity = %d\n", capacity);
 	if (capacity < 3)
 	{
-		printf("capacity = %d\n", capacity);
+
 		error("b_node::init - capcity too small.\n", true);
 	}
 	entries = get_entries(capacity);
@@ -130,7 +131,7 @@ B_Node::~B_Node()
 
 	if (entries)
 	{
-		for (int i = 0; i < capacity; i ++)
+		for (int i = 0; i < num_entries; i ++)
 		{
 			entries[i]->close();
 			delete entries[i];

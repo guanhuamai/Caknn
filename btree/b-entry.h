@@ -21,8 +21,10 @@ public:
 														//(key, leafson) forms the search key.
 														//this is to ensure fast deletions when many leaf entries have
 														//the same key.
-	int son;
+	int son;//next node block id
 	int level;
+
+    size_t addr;
 
 	//--==others==--
 	B_Tree *my_tree;

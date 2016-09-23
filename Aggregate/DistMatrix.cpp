@@ -113,6 +113,7 @@ DistMatrix::DistMatrix(int csize, int blength, char* filePrefix){
     this->filePrefix = new char[100];
     strcpy(this->filePrefix, filePrefix);
     this->initDsk(csize, blength);
+    delete[] filePrefix;
 
 }
 
@@ -120,6 +121,7 @@ DistMatrix::~DistMatrix(){
     fclose(this->fp);
     delete[] this->filePrefix;
     delete this->dc;
+    this->bt->close();
     delete this->bt;
 }
 
@@ -174,22 +176,30 @@ size_t DistMatrix::writeDist(int snid, int enid, double dist){
 
 double DistMatrix::readDist(int snid, int enid){
     double dist = -1.0;
-
     bt->load_root();
     size_t addr = this->findAddrByBT(snid, enid);
     bt->delroot();
 
-    int blk_len = dc->getBlockLength();
-    int blk_id = (int)addr / blk_len;
-    char* buf = new char[blk_len];
-    if (!dc->getCacheBlock(buf, blk_id)){
-        fseek(fp, blk_id * blk_len, SEEK_SET);
-        fread(buf, blk_len, 1, fp);
-        dc->storeCacheBlock(buf, blk_id);
-        fseek(fp, 0, SEEK_END);
+    //float* info = new float[3];
+    //bt->traverse(info);
+
+//    for (int i = 0; i < 3; i++){
+//        printf("%f %f %f", info[0], info[1], info[2]);
+//    }
+    if(addr != (size_t) -1){//address is found in b tree
+
+        int blk_len = dc->getBlockLength();
+        int blk_id = (int)addr / blk_len;
+        char* buf = new char[blk_len];
+        if (!dc->getCacheBlock(buf, blk_id)){
+            fseek(fp, blk_id * blk_len, SEEK_SET);
+            fread(buf, blk_len, 1, fp);
+            dc->storeCacheBlock(buf, blk_id);
+            fseek(fp, 0, SEEK_END);
+        }
+        memcpy(&dist, buf + addr % blk_len + 2 * sizeof(int), sizeof(double));
+        delete []buf;
     }
-    memcpy(&dist, &buf[addr % blk_len], sizeof(double));
-    delete []buf;
     return dist;
 
 }
