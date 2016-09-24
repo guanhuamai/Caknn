@@ -16,7 +16,7 @@ public:
    char* filename;
    int blocklength;	    // length of a block
    int act_block; 	    // block # of fp's position (fp can stay at block boundaries)
-   int number;		    // total # of blocks
+   size_t number;		    // total # of blocks
    bool new_flag;		// specifies if this is a new file
 
      //=====================================================
@@ -63,7 +63,7 @@ public:
    int get_blocklength()
 		{ return blocklength; }
 
-   int get_num_of_blocks()
+   size_t get_num_of_blocks()
 		{ return number; }
 };
 

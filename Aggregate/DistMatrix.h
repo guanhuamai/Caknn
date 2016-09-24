@@ -56,7 +56,7 @@ protected:
 
     virtual void initDsk(int csize, int blength);//init local cache, btree, btree cache and matrix
     virtual int* hashBTkey(int snid, int enid);
-    virtual size_t findAddrByBT(int snid, int enid);
+    virtual size_t findAddrByBT(int snid, int enid);//order is irrelative
 
 public:
 

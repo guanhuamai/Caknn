@@ -16,7 +16,7 @@ Cache::Cache(int csize, int blength)
 	if (csize >= 0) cachesize=csize;
 	else error("Cache size cannot be negative\n", TRUE);
 
-	cache_cont = new int[cachesize];
+	cache_cont = new size_t[cachesize];
 	cache_tree = new Cacheable*[cachesize];
 	fuf_cont = new uses[cachesize];
 	LRU_indicator = new int[cachesize];
@@ -24,12 +24,13 @@ Cache::Cache(int csize, int blength)
 
 	for (i = 0; i < cachesize; i++)
 	{
-    	cache_cont[i] = 0;
+    	cache_cont[i] = -1;
     	cache_tree[i] = NULL;
     	fuf_cont[i] = free;
 		LRU_indicator[i] = 0;
 		dirty_indicator[i] = false;
 	}
+	umap.clear();
 
 	cache = new char*[cachesize];
 	for (i = 0; i < cachesize; i++)
@@ -43,7 +44,7 @@ Cache::~Cache()
 	//flush();
 	  //Note that here we no longer flush the buffers in the destructor.  You should
 	  //flush all the contents in the tree destructor instead
-
+    umap.clear();
 	delete[] cache_cont;
 	delete[] fuf_cont;
 	delete[] LRU_indicator;
@@ -79,7 +80,7 @@ int Cache::next()
 	         // select a victim page to be written back to disk
              int lru_index = 0; // the index of the victim page
              for (int i = 0; i < cachesize; i++)
-                if (LRU_indicator[i] > LRU_indicator[lru_index])
+                if (LRU_indicator[i] < LRU_indicator[lru_index])//find the victim with minimun LRU hit
                     lru_index = i;
 
              ptr = lru_index;
@@ -104,25 +105,35 @@ int Cache::next()
    }
 }
 //----------------------------------------------------------------
-int Cache::in_cache(int index, Cacheable *rt)
+int Cache::in_cache(size_t index, Cacheable *rt)
 {
    int i;
    int ret_val = -1;
-   for (i = 0; i < cachesize; i++)
-	   if ((cache_cont[i] == index) && (cache_tree[i] == rt) && (fuf_cont[i] != free))
-	   {
-	       LRU_indicator[i]=0;
-		   //return i;  line commented by TAO Yufei
-		     //adding line
-		   ret_val = i;
-		     //line added
-	   }
-	   else if (fuf_cont[i] != free)
-           LRU_indicator[i]++;   // increase indicator for this block
+   if(umap[index] != -1){
+        i = umap[index].c_index;
+        if ((cache_tree[i] == rt) && (fuf_cont[i] != free)){
+            LRU_indicator[i] ++;
+            ret_val = i;
+        }
+   }
+
+
+//   for (i = 0; i < cachesize; i++)
+//	   if ((cache_cont[i] == index) && (cache_tree[i] == rt) && (fuf_cont[i] != free))
+//	   {
+//	       LRU_indicator[i]=0;
+//
+//		   ret_val = i;
+//	   }
+//	   else if (fuf_cont[i] != free)
+//           LRU_indicator[i]++;
+
+
+
    return ret_val;
 }
 //----------------------------------------------------------------
-bool Cache::read_block(Block block,int index, Cacheable *rt)
+bool Cache::read_block(Block block,size_t index, Cacheable *rt)//rt = relevant tree
 {
 	int c_ind;
 
@@ -138,10 +149,12 @@ bool Cache::read_block(Block block,int index, Cacheable *rt)
     		if (c_ind >= 0) // a block has been freed in cache
     		{
         		rt -> file -> read_block(cache[c_ind],index-1); // ext. Num.
+                umap.erase(cache_cont[c_ind]);
         		cache_cont[c_ind] = index;
+        		umap[index] = c_ind;
         		cache_tree[c_ind] = rt;
         		fuf_cont[c_ind] = used;
-        		LRU_indicator[c_ind] = 0;
+        		LRU_indicator[c_ind] = 1;
         		memcpy(block, cache[c_ind], blocklength);
     		}
     		else
@@ -157,7 +170,7 @@ bool Cache::read_block(Block block,int index, Cacheable *rt)
 	return false;
 }
 //----------------------------------------------------------------
-bool Cache::write_block(Block block, int index, Cacheable *rt)
+bool Cache::write_block(Block block, size_t index, Cacheable *rt)
 {
 	int c_ind;
 
@@ -176,7 +189,11 @@ bool Cache::write_block(Block block, int index, Cacheable *rt)
     		if (c_ind >= 0)
     		{
         		memcpy(cache[c_ind],block,blocklength);
+        		if(umap[cache_cont[c_ind]] != -1){
+                    umap.erase(cache_cont[c_ind]);
+        		}
         		cache_cont[c_ind] = index;
+        		umap[index] = c_ind;
         		cache_tree[c_ind] = rt;
         		fuf_cont[c_ind] = used;
         		LRU_indicator[c_ind] = 0;
@@ -287,7 +304,7 @@ void Cache::set_cachesize(int size)
 		delete[] dirty_indicator;
 
     	cachesize = size;
-    	cache_cont = new int[cachesize];
+    	cache_cont = new size_t[cachesize];
     	cache_tree = new Cacheable*[cachesize];
     	LRU_indicator = new int[cachesize];
     	fuf_cont = new uses[cachesize];
