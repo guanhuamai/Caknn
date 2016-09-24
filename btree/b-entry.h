@@ -17,11 +17,11 @@ public:
 
 	int *key;
 
-	int leafson;										//this field is needed only at nonleaf levels
+	size_t leafson;										//this field is needed only at nonleaf levels
 														//(key, leafson) forms the search key.
 														//this is to ensure fast deletions when many leaf entries have
 														//the same key.
-	int son;//next node block id
+	size_t son;//next node block id
 	int level;
 
     size_t addr;

@@ -14,15 +14,15 @@ class B_Node
 {
 public:
 	//--==disk residential variables==--
-	char level;
+	int level;
 	int num_entries;
-	int left_sibling;
-	int right_sibling;
+	size_t left_sibling;
+	size_t right_sibling;
 	B_Entry **entries;
 
 	//--==others==--
 	bool dirty;
-	int block;
+	size_t block;
 	int capacity;
 	B_Tree *my_tree;
 

@@ -20,7 +20,7 @@ protected:
 
 public:
 	//--==write to disk==--
-	int root;                                                       //live in memory
+	size_t root;                                                       //live in memory
 	int keysize;													//size of the key array of each entry
 
 	//--== others ==--
