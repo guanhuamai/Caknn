@@ -1,5 +1,7 @@
 #include <iostream>
 #include "Aggregate/DistMatrix.h"
+#include "Aggregate/AggMaxFunc.h"
+
 
 using namespace std;
 
