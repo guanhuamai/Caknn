@@ -16,6 +16,8 @@ public:
 
     int readLmrksFromFile(char* lmrkPath);
     double findDist(int nodeID);//lmrk id is in super class
+    bool writeDist(int nodeID);
+
 };
 
 #endif // LANDMARK_H_INCLUDED

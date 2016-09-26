@@ -1,14 +1,26 @@
+#include <set>
+#include "MovingObj.h"
+#include "Landmark.h"
+
+
 #ifndef ROADNETWORK_H_INCLUDED
 #define ROADNETWORK_H_INCLUDED
 
-#include <vector>
 
 
 
 class Edge{
+
+public:
     int snid;
     int enid;
     double edgeLen;
+
+    std::set<int> movObjsID;
+    std::set<int> lmrksID;
+
+    bool pasteMovObjs(std::vector<MovingObj> movObjs);
+    bool eraseMovObjs(std::vector<MovingObj> movObjs);
 };
 
 class Node{

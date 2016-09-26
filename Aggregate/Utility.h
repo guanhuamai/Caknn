@@ -20,7 +20,12 @@ struct MovingObjItem{//use this item to sort moving object, aggValue: aggregate 
     int oid;
     double aggValue;
     bool operator < (const MovingObjItem& objItem) const{
-        return aggValue > objItem.aggValue;
+        if(aggValue > objItem.aggValue){//dangenrous: use aggValue as key, easy to lose item in set, please syncronize 'rslts' and 'movingObjs' carefully;
+            return true;
+        }else if(aggValue > objItem.aggValue){
+            return false;
+        }
+        return oid < objItem.oid;
     }
 };
 

@@ -4,6 +4,8 @@
 #include <limits>
 #include <vector>
 #include <set>
+#include <algorithm>
+#include <unordered_map>
 
 #include "Landmark.h"
 #include "MovingObj.h"
@@ -21,17 +23,15 @@ class AggFunc{
 public:
     char* filePrefix;
     int k;                                   //k
-    std::vector<MovingObjItem> resultList;   //result set of moving object, sorted by aggregate value in decreasing order
+    std::set< MovingObjItem > rslts;   //resul of moving object, sorted by aggregate value in decreasing order
+
 
     RoadNetwork roadnw;
-    std::set<MovingObj> movingObjs;               //save in set, for delete and append efficiently
-    double updatePace;                       //the update distance at each moving object update iteration
+    std::unordered_map<int, MovingObj> movingObjs;               //save in set, for delete and append efficiently
+    //double radius;                       //the update distance at each moving object update iteration
 
 
     std::vector<Landmark> lmrks;
-
-
-
 
 
     virtual bool initRdAndLmrk(char* fileprefix);
@@ -45,12 +45,16 @@ public:
 //moving objects's change of status
 //input: affected moving objects
 
-    //append these objects from the 'movingObjs', update the 'resultList' and construct further matrix index
-    virtual bool movObjsReach(std::vector<MovingObj> reachObjs);
-    //update these objects from the 'movingObjs', update the 'resultList' and construct further matrix index
-    virtual bool movObjsShift(std::vector<MovingObj> shiftObjs);
-    //remove these objects from the 'movingObjs', and update the 'resultList'
-    virtual bool movObjsLeave(std::vector<MovingObj> leaveObjs);
+    //append these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
+    virtual bool movObjsReach(std::vector< MovingObj > reachObjs);
+    //update these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
+    virtual bool movObjsShift(std::vector< MovingObj > shiftObjs);
+    //remove these objects from the 'movingObjs', and update the 'rslts'
+    virtual bool movObjsLeave(std::vector< MovingObj > leaveObjs);
+
+
+    virtual std::vector<MovingObjItem> expandLmrkByPace(Landmark lmrk);
+    virtual bool maintainRslts(std::vector< MovingObjItem > movingObjItems, bool isDelete);
 
 
 };

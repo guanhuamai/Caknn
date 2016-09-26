@@ -2,6 +2,11 @@
 #define EDGEOBJ_H_INCLUDED
 
 
+/*
+EdgeObj is not edge, but object adhering on edge
+
+*/
+
 class EdgeObj {//object on edge, landmark and moving obj
 
 public:
@@ -14,11 +19,20 @@ public:
     double dist2en;   //distance to start node
 
 
+    EdgeObj(){
+        this->id = -1;
+    }
+
     bool operator < (const EdgeObj& objItem) const{
         return id < objItem.id;
     }
 
-
+    bool operator == (const EdgeObj &mobj){
+        if(mobj.id == this->id){
+            return true;
+        }
+        return false;
+    }
 };
 
 

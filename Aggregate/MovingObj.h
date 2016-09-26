@@ -2,6 +2,7 @@
 #define MOVINGOBJ_H_INCLUDED
 
 #include "EdgeObj.h"
+#include <vector>
 
 class MovingObj : public EdgeObj{
 
@@ -16,6 +17,10 @@ public:
     //unsigned long timestamp;        //time stamp of the moving object
 
     std::vector<MovingObj> readMobjFromFile(char* mobjPath);
+
+
+
+
 
 
 };
