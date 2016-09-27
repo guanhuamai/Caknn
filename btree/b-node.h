@@ -42,7 +42,7 @@ public:
 	virtual B_Node* get_left_sibling();
 	virtual B_Node* get_right_sibling();
 	virtual void init(int _level, B_Tree *_B_Tree);
-	virtual void init(B_Tree *_B_Tree, int _block);
+	virtual void init(B_Tree *_B_Tree, size_t _block);
 	virtual BINSRT insert(B_Entry *_new_e, B_Node **_new_nd);
 	//virtual int max_lesseq_key_pos(float _key);
 	virtual int max_lesseq_key_pos(B_Entry *_e);

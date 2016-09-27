@@ -128,7 +128,7 @@ int ExtSort::merge_runs(int _pass, int _run_num)
 			files[i] = fopen(fname, "r");
 			if (!files[i])
 			{
-				printf("reached the OS' limit of the # of opened files\n", fname);
+				//printf("reached the OS' limit of the # of opened files\n", fname);
 				printf("working with fewer runs instead, i.e., %d \n", i - 1);
 
 				fclose(files[i - 1]);							//reserving a file handle for ofp
@@ -136,7 +136,7 @@ int ExtSort::merge_runs(int _pass, int _run_num)
 
 				if (num_act_runs < 2)
 				{
-					printf("now only %d active run(s). quitting...\n");
+					printf("now only %d active run(s). quitting...\n", num_act_runs);
 					exit(1);
 				}
 			}

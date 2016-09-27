@@ -164,7 +164,7 @@ bool Cache::read_block(Block block,size_t index, Cacheable *rt)//rt = relevant t
 	}
 	else
 	{
-		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
+		printf("Requested block %zu is illegal.", index - 1);  error("\n", true);
     }
 
 	return false;
@@ -211,79 +211,12 @@ bool Cache::write_block(Block block, size_t index, Cacheable *rt)
 	}
 	else
 	{
-		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
+		printf("Requested block %zu is illegal.", index - 1);  error("\n", true);
     }
 
 	return false;
 }
-//----------------------------------------------------------------
-bool Cache::fix_block(int index, Cacheable *rt)
-{
-	int c_ind;
 
-	index++;	// Externe Num. --> interne Num.
-	if (index <= rt -> file -> get_num_of_blocks() && index>0)
-	{
-    	if((c_ind = in_cache(index, rt)) >= 0)
-		{
-			fuf_cont[c_ind] = fixed;
-			return true;
-		}
-		/*
-    	else		// nicht im C.
-    		if((c_ind=next())>=0)	// im Cache was frei?
-    		{
-        		rt->file->read_block(cache[c_ind],index-1); // ext.Num.
-        		cache_cont[c_ind]=index;
-        		cache_tree[c_ind]=rt;
-        		fuf_cont[c_ind]=fixed;
-    		}
-    		else	// kein Cache verfuegbar
-    		    return FALSE;
-		*/ /*lines commented by TAO Yufei.  this code will read a block from
-		    the disk without incrementing the page_faults.  on the second hand,
-			we choose not to fetch the page if it is not in memory*/
-		else
-			return false;
-	}
-	else
-	{
-		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
-    }
-
-	return false;;
-}
-//----------------------------------------------------------------
-bool Cache::unfix_block(int index, Cacheable *rt)
-{
-	int i;
-
-	i = 0;
-	index++;	// Externe Num. --> interne Num.
-	if(index <= rt -> file -> get_num_of_blocks() && index > 0)
-	{
-    	while(i < cachesize && (cache_cont[i] != index || fuf_cont[i] == free))
-    		i++;
-    	if (i != cachesize)
-    		fuf_cont[i] = used;
-    	return TRUE;
-	}
-	else
-	{
-		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
-    }
-
-	return false;
-}
-//----------------------------------------------------------------
-void Cache::unfix_all()
-{
-	int i;
-
-	for (i = 0; i < cachesize; i++)
-		if (fuf_cont[i] == fixed)
-			fuf_cont[i] = used;
-}
 //----------------------------------------------------------------
 void Cache::set_cachesize(int size)
 {

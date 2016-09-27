@@ -14,7 +14,7 @@ protected:
     int cachesize;	 	// max. number of cache blocks
 
     // old: int *cache_cont; store transBlockID
-    int *cache_block;	// block Id!
+    size_t *cache_block;	// block Id!
 
     int *lastTime;		// >=0 means used
     int nextTime;
@@ -35,8 +35,8 @@ public:
     virtual int getBlockLength();
     virtual void RefreshCache();
     virtual void DestroyCache();
-    virtual bool getCacheBlock(char* buffer,int BlockId);
-    virtual void storeCacheBlock(char* buffer,int BlockId);	// user's responsibility
+    virtual bool getCacheBlock(char* buffer,size_t BlockId);
+    virtual void storeCacheBlock(char* buffer,size_t BlockId);	// user's responsibility
     virtual void printPageAccess();//show the statistics
     virtual void RefreshStat();// make statistics zero
 };

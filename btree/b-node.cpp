@@ -39,8 +39,8 @@ void B_Node::init(int _level, B_Tree *_B_Tree)
 	my_tree = _B_Tree;
 	int b_length = my_tree -> file -> get_blocklength();
 
-	left_sibling = -1;
-	right_sibling = -1;
+	left_sibling = (size_t)-1;
+	right_sibling = (size_t)-1;
 	num_entries = 0;
 	level = _level;
 
@@ -75,7 +75,7 @@ para:
 by yufei tao, 1 aug 08
 *****************************************************************/
 
-void B_Node::init(B_Tree *_B_Tree, int _block)
+void B_Node::init(B_Tree *_B_Tree, size_t _block)
 {
     my_tree = _B_Tree;
     num_entries = 0;
@@ -170,10 +170,13 @@ bool B_Node::chk_ovrflw()
 
 bool B_Node::chk_undrflw()
 {
-	if (my_tree->root_ptr->level==level)
-		if (num_entries==1 && level>0)
+	if (my_tree->root_ptr->level==level){
+
+
+		if (num_entries==1 && level>0){
 			return true;
-		else return false;
+		}else return false;
+    }
 	if (num_entries <= (capacity-2)/2) return true;
 	else return false;
 }
@@ -400,7 +403,7 @@ B_Node* B_Node::get_left_sibling()
 {
 	B_Node *ret = NULL;
 
-	if (left_sibling != -1)
+	if (left_sibling != (size_t)-1)
 	{
 		ret = new_one_node();
 		ret->init(my_tree, left_sibling);
@@ -420,7 +423,7 @@ B_Node* B_Node::get_right_sibling()
 {
 	B_Node *ret = NULL;
 
-	if (right_sibling != -1)
+	if (right_sibling != (size_t)-1)
 	{
 		ret = new_one_node();
 		ret->init(my_tree, right_sibling);
@@ -535,7 +538,7 @@ void B_Node::trt_ovrflw(B_Node **_new_nd)
 	(*_new_nd)->left_sibling = block;
 	right_sibling = (*_new_nd) -> block;
 
-	if ((*_new_nd)->right_sibling != -1)
+	if ((*_new_nd)->right_sibling != (size_t)-1)
 	{
 		B_Node *nd = new_one_node();
 		nd->init(my_tree, (*_new_nd)->right_sibling);
@@ -746,7 +749,7 @@ void B_Node::trt_undrflw(int _follow)
 		{
 			succ1->left_sibling = succ2->left_sibling;
 
-			if (succ1->left_sibling != -1)
+			if (succ1->left_sibling != (size_t)-1)
 			{
 				B_Node *nd = new_one_node();
 				nd->init(my_tree, succ1->left_sibling);
@@ -759,7 +762,7 @@ void B_Node::trt_undrflw(int _follow)
 		{
 			succ1->right_sibling = succ2->right_sibling;
 
-			if (succ1->right_sibling != -1)
+			if (succ1->right_sibling != (size_t)-1)
 			{
 				B_Node *nd = new_one_node();
 				nd->init(my_tree, succ1->right_sibling);
@@ -805,7 +808,7 @@ int B_Node::traverse(float *_info)
 		if (entries[i]->compare(entries[i + 1]) != -1)
 		{
 			printf("Entry ordering error\n");
-			printf("Block %d, level %d, entry %d\n", block, level, i);
+			printf("Block %zu, level %d, entry %d\n", block, level, i);
 			error("I am aborting...\n", true);
 		}
 	}
@@ -828,7 +831,7 @@ int B_Node::traverse(float *_info)
 				entries[i]->leafson != nd->entries[0]->leafson)
 			{
 				printf("Entry content error\n");
-				printf("Block %d, level %d, entry %d\n", block, level, i);
+				printf("Block %zu, level %d, entry %d\n", block, level, i);
 				error("I am aborting...\n", true);
 			}
 			int cret = nd->traverse(_info);
@@ -853,7 +856,7 @@ int B_Node::traverse(float *_info)
 			error("I am aborting...\n", true);
 		}
 
-		if (my_tree->last_right_sibling != -1 && my_tree->last_right_sibling != block)
+		if (my_tree->last_right_sibling != (size_t)-1 && my_tree->last_right_sibling != block)
 		{
 			printf("Right sibling ptr error\n");
 			//printf("Block %d, level %d, entry %d\n", block, level, i);

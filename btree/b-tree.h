@@ -16,7 +16,7 @@ class B_Tree : public Cacheable
 
 protected:
 
-    int num;
+    size_t num;
 
 public:
 	//--==write to disk==--
@@ -27,8 +27,8 @@ public:
 	B_Node *root_ptr;                                               //not live in memory
 
 	//--=== for debugging ===--
-	int last_leaf;
-	int last_right_sibling;
+	size_t last_leaf;
+	size_t last_right_sibling;
 	int debug_info[100];
 	int quiet;														//control how often info is displayed
 																	//higher value means fewer msgs
@@ -38,9 +38,9 @@ public:
 	B_Tree();
 	virtual ~B_Tree();
 	virtual void add_fname_ext(char * _fname);
-	virtual void bulkload(char *_fname);
-	virtual int bulkload2(void *_ds, int _n);
-	virtual void build_from_file(char *_dsname);
+	//virtual void bulkload(char *_fname);
+	//virtual int bulkload2(void *_ds, int _n);
+	//virtual void build_from_file(char *_dsname);
 	virtual void close();
 	virtual bool delete_entry(B_Entry * _del_e);
 	virtual void delroot();

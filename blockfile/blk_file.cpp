@@ -20,28 +20,28 @@ equals to number - 1
 #include "../gadget/gadget.h"
 //--------------------------BlockFile-----------------------------
 
-void BlockFile::fwrite_number(int value)
+void BlockFile::fwrite_number(size_t value)
 {
 
-   put_bytes((char *) &value, sizeof(int));
+   put_bytes((char *) &value, sizeof(size_t));
 }
 
 //----------------------------------------------------------------
 
-int BlockFile::fread_number()
+size_t BlockFile::fread_number()
 {
-   char ca[sizeof(int)];
+   char ca[sizeof(size_t)];
 
-   get_bytes(ca,sizeof(int));
-   return *((int *)ca);
+   get_bytes(ca,sizeof(size_t));
+   return *((size_t *)ca);
 }
 
 //----------------------------------------------------------------
 
-BlockFile::BlockFile(char* name,int b_length)
+BlockFile::BlockFile(char* name,size_t b_length)
 {
    char *buffer;
-   int l;
+   size_t l;
 
    //printf("BlockFile Version 1.0\n");
 
@@ -126,14 +126,14 @@ void BlockFile::set_header(char* header)
 
 //----------------------------------------------------------------
 
-bool BlockFile::read_block(Block b,int pos)
+bool BlockFile::read_block(Block b,size_t pos)
 {
    pos++;     //external block to internal block
    if (pos<=number && pos>0)
        seek_block(pos);
    else
    {
-	   printf("Requested block %d is illegal.", pos - 1);  error("\n", true);
+	   printf("Requested block %zu is illegal.", pos - 1);  error("\n", true);
    }
 
    get_bytes(b,blocklength);
@@ -150,7 +150,7 @@ bool BlockFile::read_block(Block b,int pos)
 
 //----------------------------------------------------------------
 
-bool BlockFile::write_block(Block block, int pos)
+bool BlockFile::write_block(Block block, size_t pos)
   //note that this function can only write to an already allocated block.  to
   //allocate a new block, use append_block instead.
 {
@@ -160,7 +160,7 @@ bool BlockFile::write_block(Block block, int pos)
        seek_block(pos);
    else
    {
-	   printf("Requested block %d is illegal.", pos - 1);  error("\n", true);
+	   printf("Requested block %zu is illegal.", pos - 1);  error("\n", true);
    }
    put_bytes(block,blocklength);
    if (pos+1>number)
@@ -176,12 +176,12 @@ bool BlockFile::write_block(Block block, int pos)
 
 //----------------------------------------------------------------
 
-int BlockFile::append_block(Block block)
+size_t BlockFile::append_block(Block block)
 {
    fseek(fp,0,SEEK_END);
    put_bytes(block,blocklength);
    number++;
-   fseek(fp,sizeof(int),SEEK_SET);
+   fseek(fp,sizeof(size_t),SEEK_SET);
    fwrite_number(number);
    fseek(fp,-blocklength,SEEK_END);
 
@@ -190,13 +190,13 @@ int BlockFile::append_block(Block block)
 
 //----------------------------------------------------------------
 
-bool BlockFile::delete_last_blocks(int num)
+bool BlockFile::delete_last_blocks(size_t num)
 {
    if (num>number)
       return FALSE;
 
    number -= num;
-   fseek(fp,sizeof(int),SEEK_SET);
+   fseek(fp,sizeof(size_t),SEEK_SET);
    fwrite_number(number);
    fseek(fp,0,SEEK_SET);
    act_block=0;
@@ -330,7 +330,7 @@ CachedBlockFile::~CachedBlockFile()
 
 //----------------------------------------------------------------
 
-bool CachedBlockFile::read_block(Block block, int index)
+bool CachedBlockFile::read_block(Block block, size_t index)
 {
 	int c_ind;
 
@@ -361,7 +361,7 @@ bool CachedBlockFile::read_block(Block block, int index)
 	}
 	else
 	{
-		printf("The requested block %d is illegal", index - 1);  error("\n", true);
+		printf("The requested block %zu is illegal", index - 1);  error("\n", true);
 		return FALSE;  //adding this line is just to avoid the warning "not all the
 		               //path return values".
 	}
@@ -369,7 +369,7 @@ bool CachedBlockFile::read_block(Block block, int index)
 
 //----------------------------------------------------------------
 
-bool CachedBlockFile::write_block(Block block, int index)
+bool CachedBlockFile::write_block(Block block, size_t index)
 {
 	int c_ind;
 
@@ -400,72 +400,15 @@ bool CachedBlockFile::write_block(Block block, int index)
 	}
 	else
 	{
-	   printf("Requested block %d is illegal.", index - 1); error("\n", true);
+	   printf("Requested block %zu is illegal.", index - 1); error("\n", true);
 	   return FALSE;
 	}
 }
 
 //----------------------------------------------------------------
 
-bool CachedBlockFile::fix_block(int index)
-  //call the function to pin a certain block in the memory.
-{
-	int c_ind;
 
-	index++;	// External Num. --> internal Num.
 
-	if (index <= get_num_of_blocks() && index > 0)
-	{
-		if((c_ind = in_cache(index)) >= 0)
-		{
-			return TRUE;
-			fuf_cont[c_ind] = fixed;
-		}
-		/*
-		else
-			if((c_ind = next()) >= 0)
-			{
-				BlockFile::read_block(cache[c_ind], index-1); // ext.Num.
-				cache_cont[c_ind]=index;
-				fuf_cont[c_ind]=fixed;
-			}
-			else	// kein Cache verfuegbar
-			return FALSE;
-		*/  /*lines commented by TAO Yufei.  this code will read a block from
-		    the disk without incrementing the page_faults.  on the second hand,
-			we choose not to fetch the page if it is not in memory*/
-		else
-			return FALSE;
-	}
-	else
-	{
-		printf("Requested block %d is illegal.", index - 1);  error("\n", true);
-    }
-
-	return false;
-}
-//----------------------------------------------------------------
-bool CachedBlockFile::unfix_block(int index)
-// Fixierung eines Blocks durch fix_block wieder aufheben
-{
-	int i;
-
-	i = 0;
-	index++;	// Externe Num. --> interne Num.
-	if(index <= get_num_of_blocks() && index>0)
-	{
-		while(i<cachesize && (cache_cont[i]!=index || fuf_cont[i] == free))
-			i++;
-		if (i != cachesize)
-			fuf_cont[i] = used;
-
-		return TRUE;
-	}
-	else
-		return FALSE;
-}
-
-//----------------------------------------------------------------
 
 void CachedBlockFile::unfix_all()
 {

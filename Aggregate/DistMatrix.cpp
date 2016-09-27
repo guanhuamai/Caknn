@@ -62,7 +62,7 @@ void DataCache::DestroyCache() {
 	delete[] cache;
 }
 
-bool DataCache::getCacheBlock(char* buffer,int BlockId) {
+bool DataCache::getCacheBlock(char* buffer,size_t BlockId) {
 	CACHE_ACCESSED++;
 	for (int i=0;i<cachesize;i++)
 		if ((cache_block[i]==BlockId)&&
@@ -74,7 +74,7 @@ bool DataCache::getCacheBlock(char* buffer,int BlockId) {
 	return false;
 }
 // the place for counting number of page accesses
-void DataCache::storeCacheBlock(char* buffer, int BlockId) {
+void DataCache::storeCacheBlock(char* buffer, size_t BlockId) {
 	int index=-1;
 	for (int i=0;i<cachesize;i++)	// search for exist block
 		if (cache_block[i] == BlockId && lastTime[i] >= 0) {index=i;	break;}
@@ -177,7 +177,7 @@ size_t DistMatrix::writeDist(int snid, int enid, double dist){
 
 //update the memory cache
     int blk_len = dc->getBlockLength();
-    int blk_id = (int)addr / blk_len;
+    size_t blk_id = (size_t)addr / blk_len;
     char* buf = new char[blk_len];
     fseek(fp, blk_id * blk_len, SEEK_SET);
     fread(buf, blk_len, 1, fp);

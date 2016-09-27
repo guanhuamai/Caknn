@@ -22,12 +22,9 @@ int main()
         if(dist - (query + 100.1) > 0.00001 || dist - (query + 100.1) < -0.00001){
             printf("%d %lf\n", query, mt->readDist(query + 5, query + 6));
         }
-
-
         if(i % 10000 == 0){
             printf("%dth iteration! query = %d dist = %lf\n", i, query, dist);
         }
-
     }
     printf("success check btree\n");
 

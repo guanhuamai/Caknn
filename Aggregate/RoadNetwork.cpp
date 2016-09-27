@@ -11,7 +11,7 @@ size_t Edge::getOppositeNode(size_t nid){
 
 bool Edge::pasteMovObjs(std::vector<MovingObj> movOjbs){
 
-    for(int i = 0; i < movOjbs.size(); i++){
+    for(size_t i = 0; i < movOjbs.size(); i++){
         if(movObjsID.find(movOjbs[i].id) == movObjsID.end()){
             movObjsID.insert(movOjbs[i].id);
         }else{

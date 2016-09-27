@@ -77,11 +77,6 @@ public:
 
    bool write_block(Block b, size_t i, Cacheable *rt);
 
-   bool fix_block(int i, Cacheable *rt);
-
-   bool unfix_block(int i, Cacheable *rt);
-
-   void unfix_all();
 
    void set_cachesize(int s);
 
