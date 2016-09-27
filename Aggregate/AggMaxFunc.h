@@ -12,11 +12,12 @@ public:
 
     void expandLmrkByPace(Landmark &lmrk) override{
 
-        NodeItem ndItem = lmrk.pq.top();
+        NodeItem ndItem = lmrk.ndHeap[0];
         double oldRadius = radius;
         radius += pace;
         while(std::abs(ndItem.dist - radius) > DBL_ERROR && ndItem.dist < radius){
-            lmrk.pq.pop();
+            std::pop_heap(lmrk.ndHeap);
+            lmrk.ndHeap.pop_back();
             Node &nd = roadnw.nodes[ndItem.nid];
             for(size_t i = 0; i < nd.adjacentEdge.size(); i++){
                 size_t adjEdgeID = nd.adjacentEdge[i];
@@ -37,9 +38,21 @@ public:
 
                 if(!lmrk.isEdgeVisit[adjEdgeID]){
                     lmrk.isEdgeVisit[adjEdgeID] = true;
-                    size_t nextNode = roadnw.edges[adjEdgeID].getOppositeNode(ndItem.nid);
+                    size_t nextNodeID = roadnw.edges[adjEdgeID].getOppositeNode(ndItem.nid);
                     double nextDist = roadnw.edges[adjEdgeID].edgeLen + ndItem.dist;
-                    lmrk.pq.push(NodeItem(nextNode, nextDist));
+                    for(size_t i = 0; i < lmrk.ndHeap.size(); i++){
+                        if(lmrk.ndHeap[i].nid == nextNodeID){
+                            if(std::abs(nextDist - lmrk.ndHeap[i].dist) > DBL_ERROR && nextDist < lmrk.ndHeap[i].dist){
+                                lmrk.ndHeap[i].dist = nextDist;
+                                std::make_heap(lmrk.ndHeap);
+                                break;
+                            }
+                        }
+                        else if(i == lmrk.ndHeap.size() - 1){
+                            lmrk.ndHeap.push_back(NodeItem(nextNodeID, nextDist));
+                            std::push_heap(lmrk.ndHeap);
+                        }
+                    }
                 }
             }
         }

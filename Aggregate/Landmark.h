@@ -2,7 +2,7 @@
 #define LANDMARK_H_INCLUDED
 
 
-#include <queue>
+#include <vector>
 #include "EdgeObj.h"
 #include "MovingObj.h"
 #include "Utility.h"
@@ -13,7 +13,7 @@ class Landmark : public EdgeObj{
 
 public:
 //aggregate information:
-    std::priority_queue<NodeItem> pq;
+    std::vector<NodeItem> ndHeap;
     bool *isEdgeVisit;
 
 
