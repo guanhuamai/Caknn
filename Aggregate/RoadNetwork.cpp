@@ -1,6 +1,14 @@
 #include "RoadNetwork.h"
 
 
+
+size_t Edge::getOppositeNode(size_t nid){
+    if(nid == snid){
+        return enid;
+    }
+    return snid;
+}
+
 bool Edge::pasteMovObjs(std::vector<MovingObj> movOjbs){
 
     for(int i = 0; i < movOjbs.size(); i++){
@@ -16,8 +24,8 @@ bool Edge::pasteMovObjs(std::vector<MovingObj> movOjbs){
 
 
 bool Edge::eraseMovObjs(std::vector<MovingObj> movOjbs){
-    for(int i = 0; i < movOjbs.size(); i++){
-        std::set<int>::iterator itr = this->movObjsID.find(movOjbs[i].id);
+    for(size_t i = 0; i < movOjbs.size(); i++){
+        std::set<size_t>::iterator itr = this->movObjsID.find(movOjbs[i].id);
         if(itr != this->movObjsID.end()){
             this->movObjsID.erase(itr);
         }else{

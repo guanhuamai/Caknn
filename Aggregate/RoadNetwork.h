@@ -12,47 +12,50 @@
 class Edge{
 
 public:
-    int snid;
-    int enid;
+    size_t snid;
+    size_t enid;
     double edgeLen;
 
-    std::set<int> movObjsID;
-    std::set<int> lmrksID;
+    std::set<size_t> movObjsID;
+    std::set<size_t> lmrksID;
 
     bool pasteMovObjs(std::vector<MovingObj> movObjs);
     bool eraseMovObjs(std::vector<MovingObj> movObjs);
+    size_t  getOppositeNode(size_t nid);
 };
 
 class Node{
-    std::vector<Edge> adjacentEdge;
+
+public:
+    std::vector<size_t> adjacentEdge;
 };
 
 class RoadNetwork{
 
+
+public:
     Edge* edges;
-    int edgenum;
+    size_t edgenum;
 
     Node* nodes;
-    int nodenum;
+    size_t nodenum;
 
     virtual ~RoadNetwork();
 };
 
-RoadNetwork::~RoadNetwork(){
-
-    this->edgenum = 0;
-    this->nodenum = 0;
-    delete[] this->edges;
-    delete[] this->nodes;
-
-
-    int readNodesFromFile(char* nodePath);
-    int readEdgesFromFile(char* edgePath);
-
-
-
-}
-
-
+//RoadNetwork::~RoadNetwork(){
+//
+//    this->edgenum = 0;
+//    this->nodenum = 0;
+//    delete[] this->edges;
+//    delete[] this->nodes;
+//
+//
+//    int readNodesFromFile(char* nodePath);
+//    int readEdgesFromFile(char* edgePath);
+//
+//
+//
+//}
 
 #endif // ROADNETWORK_H_INCLUDED

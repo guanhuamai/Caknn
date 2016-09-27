@@ -4,19 +4,26 @@
 
 #include <queue>
 #include "EdgeObj.h"
+#include "MovingObj.h"
 #include "Utility.h"
 #include "DistMatrix.h"
+
 
 class Landmark : public EdgeObj{
 
 public:
 //aggregate information:
     std::priority_queue<NodeItem> pq;
+    bool *isEdgeVisit;
 
 
     int readLmrksFromFile(char* lmrkPath);
-    double findDist(int nodeID);//lmrk id is in super class
-    bool writeDist(int nodeID);
+    double findDist(size_t nodeID);//lmrk id is in super class
+    bool writeDist(size_t nodeID);
+    double getMovObjDist(MovingObj mobj);
+
+
+
 
 };
 

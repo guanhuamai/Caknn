@@ -1,20 +1,26 @@
-#ifndef AGGFUNC_H_INCLUDED
-#define AGGFUNC_H_INCLUDED
 
-#include <limits>
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_map>
 
-#include "Landmark.h"
-#include "MovingObj.h"
+//#include "Landmark.h"
+//#include "MovingObj.h"
 #include "DistMatrix.h"
 #include "Utility.h"
 #include "RoadNetwork.h"
 
 
-#define DBL_MAX std::numeric_limits<double>::max()
+#ifndef AGGFUNC_H_INCLUDED
+#define AGGFUNC_H_INCLUDED
+
+
+
+
+
+
+const double pace = 200.0;
+
 
 class AggFunc{
 
@@ -22,16 +28,19 @@ class AggFunc{
 
 public:
     char* filePrefix;
-    int k;                                   //k
-    std::set< MovingObjItem > rslts;   //resul of moving object, sorted by aggregate value in decreasing order
+    size_t k;                                          //k
+    std::set< MovingObjItem > rslts;                //resul of moving object, sorted by aggregate value in decreasing order
 
 
     RoadNetwork roadnw;
-    std::unordered_map<int, MovingObj> movingObjs;               //save in set, for delete and append efficiently
-    //double radius;                       //the update distance at each moving object update iteration
+    std::unordered_map<size_t, MovingObj> movingObjs;                  //save in set, for delete and append efficiently
+    //double radius;                                                //the update distance at each moving object update iteration
 
 
     std::vector<Landmark> lmrks;
+
+    double radius;
+    double pace;
 
 
     virtual bool initRdAndLmrk(char* fileprefix);
@@ -46,15 +55,17 @@ public:
 //input: affected moving objects
 
     //append these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
-    virtual bool movObjsReach(std::vector< MovingObj > reachObjs);
+    virtual void movObjsReach(std::vector< MovingObj > reachObjs);
     //update these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
-    virtual bool movObjsShift(std::vector< MovingObj > shiftObjs);
+    virtual void movObjsShift(std::vector< MovingObj > shiftObjs);
     //remove these objects from the 'movingObjs', and update the 'rslts'
-    virtual bool movObjsLeave(std::vector< MovingObj > leaveObjs);
+    virtual void movObjsLeave(std::vector< MovingObj > leaveObjs);
 
 
-    virtual std::vector<MovingObjItem> expandLmrkByPace(Landmark lmrk);
-    virtual bool maintainRslts(std::vector< MovingObjItem > movingObjItems, bool isDelete);
+    virtual void expandLmrkByPace(Landmark &lmrk);
+    virtual bool addRslts(std::vector< MovingObjItem > movingObjItems);
+    virtual bool eraseRslts(std::vector< MovingObjItem > movingObjItems);
+    virtual double getMovObjDist(Landmark lmrk, MovingObj mobj);
 
 
 };
