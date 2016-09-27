@@ -80,9 +80,13 @@ public:
             }
         }
         if(!addRslts(mObjItems)){//after adding the moving objects to graph, rslts size
-            for(size_t i = 0; i < lmrks.size(); i++){
-                expandLmrkByPace(lmrks[i]);
+
+            while(rslts.size() < k){
+                for(size_t i = 0; i < lmrks.size(); i++){
+                    expandLmrkByPace(lmrks[i]);
+                }
             }
+
         }
     }
 };
