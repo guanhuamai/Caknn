@@ -4,8 +4,6 @@
 #define AGGFUNC_H_INCLUDED
 
 
-
-
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -47,7 +45,7 @@ public:
 
 //stop consition for single update for a landmark
 //input: landmark id
-    virtual bool isStopSearch(int lid) = 0;
+    virtual bool isExpand() = 0;
 
 
 
@@ -66,6 +64,9 @@ public:
     virtual bool addRslts(std::vector< MovingObjItem > movingObjItems);
     virtual bool eraseRslts(std::vector< MovingObjItem > movingObjItems);
     virtual double getMovObjDist(Landmark lmrk, MovingObj mobj);
+
+    virtual double aggBound();//return aggregate value bound at kth results
+    virtual double aggUpdate(double aggValue, double dist);
 
 
 };
