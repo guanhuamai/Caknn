@@ -7,10 +7,10 @@
 #define DBL_MAX std::numeric_limits<double>::max()
 
 struct NodeItem{//use this item to sort node, dist: distance to specific landmark
-    int nid;
+    size_t nid;
     double dist;
 
-    NodeItem(int nid, double dist){
+    NodeItem(size_t nid, double dist){
         this->nid = nid;
         this->dist = dist;
     }

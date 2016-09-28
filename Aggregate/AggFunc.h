@@ -1,4 +1,11 @@
 
+
+#ifndef AGGFUNC_H_INCLUDED
+#define AGGFUNC_H_INCLUDED
+
+
+
+
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -9,13 +16,6 @@
 #include "DistMatrix.h"
 #include "Utility.h"
 #include "RoadNetwork.h"
-
-
-#ifndef AGGFUNC_H_INCLUDED
-#define AGGFUNC_H_INCLUDED
-
-
-
 
 
 
@@ -59,7 +59,7 @@ public:
     //update these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
     virtual void movObjsShift(std::vector< MovingObj > shiftObjs);
     //remove these objects from the 'movingObjs', and update the 'rslts'
-    virtual void movObjsLeave(std::vector< MovingObj > leaveObjs);
+    virtual void movObjsLeave(std::vector< size_t > leaveObjs, bool reachEnd);
 
 
     virtual void expandLmrkByPace(Landmark &lmrk);

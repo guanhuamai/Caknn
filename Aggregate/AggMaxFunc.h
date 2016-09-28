@@ -3,7 +3,6 @@
 
 #include "AggFunc.h"
 
-
 class AggMaxFunc: public AggFunc{
 
 public:
@@ -16,13 +15,16 @@ public:
         double oldRadius = radius;
         radius += pace;
         while(std::abs(ndItem.dist - radius) > DBL_ERROR && ndItem.dist < radius){
-            std::pop_heap(lmrk.ndHeap);
+            std::pop_heap(lmrk.ndHeap.begin(), lmrk.ndHeap.end());
+
             lmrk.ndHeap.pop_back();
             Node &nd = roadnw.nodes[ndItem.nid];
+
             for(size_t i = 0; i < nd.adjacentEdge.size(); i++){
                 size_t adjEdgeID = nd.adjacentEdge[i];
                 Edge &edge = roadnw.edges[adjEdgeID];
-                for(std::set<size_t>::iterator itr = edge.movObjsID.begin(); itr != edge.movObjsID.end(); itr++){//calculate distance for moving obj in (oldRadius, radius]
+                //calculate distance for moving obj in (oldRadius, radius]
+                for(std::set<size_t>::iterator itr = edge.movObjsID.begin(); itr != edge.movObjsID.end(); itr++){
                     MovingObj& mObj = movingObjs[*itr];
                     double dist = lmrk.getMovObjDist(mObj);
                     if(std::abs(dist - oldRadius) > DBL_ERROR  && dist > oldRadius &&
@@ -36,7 +38,7 @@ public:
                     }
                 }
 
-                if(!lmrk.isEdgeVisit[adjEdgeID]){
+                if(!lmrk.isEdgeVisit[adjEdgeID]){//dijks expand unvisit edges
                     lmrk.isEdgeVisit[adjEdgeID] = true;
                     size_t nextNodeID = roadnw.edges[adjEdgeID].getOppositeNode(ndItem.nid);
                     double nextDist = roadnw.edges[adjEdgeID].edgeLen + ndItem.dist;
@@ -44,13 +46,14 @@ public:
                         if(lmrk.ndHeap[i].nid == nextNodeID){
                             if(std::abs(nextDist - lmrk.ndHeap[i].dist) > DBL_ERROR && nextDist < lmrk.ndHeap[i].dist){
                                 lmrk.ndHeap[i].dist = nextDist;
-                                std::make_heap(lmrk.ndHeap);
+                                std::make_heap(lmrk.ndHeap.begin(), lmrk.ndHeap.end());
                                 break;
                             }
                         }
                         else if(i == lmrk.ndHeap.size() - 1){
                             lmrk.ndHeap.push_back(NodeItem(nextNodeID, nextDist));
-                            std::push_heap(lmrk.ndHeap);
+                            std::push_heap(lmrk.ndHeap.begin(), lmrk.ndHeap.end());
+
                         }
                     }
                 }
@@ -59,6 +62,7 @@ public:
     }
 
     void movObjsReach(std::vector<MovingObj> reachObjs) override {
+
         std::vector<MovingObjItem> mObjItems;
         mObjItems.reserve(reachObjs.size());
         for(size_t i = 0; i < reachObjs.size(); i++){
@@ -79,8 +83,8 @@ public:
                 mObjItems.push_back(mObjItem);
             }
         }
-        if(!addRslts(mObjItems)){//after adding the moving objects to graph, rslts size
 
+        if(!addRslts(mObjItems)){//after adding the moving objects to graph, rslts size
             while(rslts.size() < k){
                 for(size_t i = 0; i < lmrks.size(); i++){
                     expandLmrkByPace(lmrks[i]);
@@ -89,6 +93,24 @@ public:
 
         }
     }
+
+    void movObjsLeave(std::vector< size_t > leaveObjs, bool reachEnd){
+        for(size_t i = 0; i < leaveObjs.size(); i++){
+            size_t id = leaveObjs[i];
+            double aggValue = movingObjs[id].aggValue;
+            rslts.erase(MovingObjItem(id, aggValue));
+            movingObjs.erase(leaveObjs[i]);
+        }
+        if(!reachEnd){
+            while(rslts.size() < k){
+                for(size_t i = 0; i < lmrks.size(); i++){
+                    expandLmrkByPace(lmrks[i]);
+                }
+            }
+        }
+    }
+
+
 };
 
 

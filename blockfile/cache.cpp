@@ -189,7 +189,7 @@ bool Cache::write_block(Block block, size_t index, Cacheable *rt)
     		if (c_ind >= 0)
     		{
         		memcpy(cache[c_ind],block,blocklength);
-        		if(umap[cache_cont[c_ind]] != -1){
+        		if(umap[cache_cont[c_ind]] != (size_t)-1){
                     umap.erase(cache_cont[c_ind]);
         		}
         		cache_cont[c_ind] = index;

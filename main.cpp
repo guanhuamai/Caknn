@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
 
-    DistMatrix* mt = new DistMatrix(500000, 5000, "test");
+    DistMatrix* mt = new DistMatrix(1500000, 6000, "test");
 
     for (int i = 0; i < 100000000; i++){
 

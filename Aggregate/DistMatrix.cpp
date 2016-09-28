@@ -26,7 +26,7 @@ void DataCache::InitCache(int csize, int blength) {
 	nextTime=0;
 	cachesize=csize;
 	blocklength = blength;
-	cache_block = new int[cachesize];
+	cache_block = new size_t[cachesize];
 
 	cache = new char*[cachesize];
 	lastTime=new int[cachesize];
@@ -199,6 +199,10 @@ double DistMatrix::readDist(int snid, int enid){
     bt->load_root();
     size_t addr = this->findAddrByBT(snid, enid);
     bt->delroot();
+    if((snid - 5) % 10000 == 0){
+        printf("umap size: %zu\n", (bt->cache->umap.size()));
+    }
+
 
 //    float* info = new float[3];
 //    bt->traverse(info);
@@ -220,6 +224,7 @@ double DistMatrix::readDist(int snid, int enid){
         memcpy(&dist, buf + addr % blk_len + 2 * sizeof(int), sizeof(double));
         delete []buf;
     }
+
     return dist;
 
 }
