@@ -26,6 +26,8 @@ public:
 class Node{
 
 public:
+    double lon;
+    double lat;
     std::vector<size_t> adjacentEdge;
 };
 
@@ -38,6 +40,8 @@ public:
 
     Node* nodes;
     size_t nodenum;
+
+    RoadNetwork(char* filePrefix);
 
     virtual ~RoadNetwork();
 };

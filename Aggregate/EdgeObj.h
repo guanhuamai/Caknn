@@ -20,6 +20,8 @@ public:
     double dist2sn;   //distance to start node
     double dist2en;   //distance to start node
 
+    EdgeObj(size_t id, size_t snid, size_t enid, size_t eid, double dist2sn, double dist2en)
+        :id(id), snid(snid), enid(enid), eid(eid), dist2sn(dist2sn), dist2en(dist2en){}
 
     EdgeObj(){
         this->id = (size_t) -1;
@@ -58,8 +60,6 @@ public:
     DistMatrix* dm;
     bool *isEdgeVisit;
 
-
-    int readLmrksFromFile(char* lmrkPath);
     double findDist(size_t nodeID);//lmrk id is in super class
     void  writeDist(size_t nodeID, double dist);
     double getMovObjDist(MovingObj &mobj);

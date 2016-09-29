@@ -54,12 +54,13 @@ protected:
             return *this;
         }
     };
-
     std::unordered_map<size_t, BlkPos> umap;        //hash block id to cache position
+
 
 //this operation is to regulate cache in memory
 
 public:
+
     DataCache(int csize, int blocklen);
     virtual ~DataCache();
     virtual void InitCache(int csize, int blength);

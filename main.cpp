@@ -11,12 +11,7 @@ int main()
     DistMatrix* mt = new DistMatrix(1500000, 6000, "test");
 
     for (int i = 0; i < 100000000; i++){
-
-
-
         mt->writeDist(i + 5, i + 6, i + 100.1);
-
-
         int query = ((double)rand() / RAND_MAX) * i;
         double dist = mt->readDist(query + 5, query + 6);
         if(dist - (query + 100.1) > 0.00001 || dist - (query + 100.1) < -0.00001){
@@ -29,13 +24,6 @@ int main()
     printf("success check btree\n");
 
 
-//    for (int i = 0; i < 10000000; i++){
-//        double dist = mt->readDist(i + 5, i + 6);
-//        if(dist - (i + 100.1) > 0.00001 || dist - (i + 100.1) < -0.00001){
-//            printf("%lf\n", mt->readDist(i + 5, i + 6));
-//        }
-//
-//    }
     printf("success\n");
 
 

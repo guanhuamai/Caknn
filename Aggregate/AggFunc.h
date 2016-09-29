@@ -25,18 +25,19 @@ public:
 
 
     std::vector<Landmark> lmrks;
-
     double radius;
     double pace;
 
 //stop consition for single update for a landmark
 //input: landmark id
     virtual bool isExpand() = 0;
-
+    virtual double aggUpdate(double aggValue, double dist) = 0;
+    virtual double aggBound();//return aggregate value bound at kth results
+    virtual bool addRslts(std::vector< MovingObjItem > movingObjItems);
+    virtual void readLmrks(char* filePrefix);
 
 //moving objects's change of status
 //input: affected moving objects
-
     //append these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
     virtual void movObjsReach(std::vector< MovingObj > reachObjs);
     //update these objects from the 'movingObjs', update the 'rslts' and construct further matrix index
@@ -44,14 +45,7 @@ public:
     //remove these objects from the 'movingObjs', and update the 'rslts'
     virtual void movObjsLeave(std::vector< size_t > leaveObjs, bool reachEnd);
 
-
     virtual void expandLmrkByPace(Landmark &lmrk);
-    virtual bool addRslts(std::vector< MovingObjItem > movingObjItems);
-
-    virtual double aggBound();//return aggregate value bound at kth results
-    virtual double aggUpdate(double aggValue, double dist) = 0;
-
-
 };
 
 

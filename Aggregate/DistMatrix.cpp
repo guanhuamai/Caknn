@@ -67,11 +67,12 @@ void DataCache::DestroyCache() {
 bool DataCache::getCacheBlock(char* buffer,size_t BlockId) {
 	CACHE_ACCESSED++;
     int c_index = umap[BlockId].c_index;
-    if(cache_block[c_index] == BlockId && (lastTime[c_index] >= 0)){
+    if(c_index != -1 && cache_block[c_index] == BlockId && (lastTime[c_index] >= 0)){
         memcpy(buffer,cache[c_index],blocklength);
         lastTime[c_index]=nextTime++;
         return true;
     }
+    umap.erase(BlockId);
 //	for (int i=0;i<cachesize;i++)
 //		if ((cache_block[i]==BlockId)&&
 //			(lastTime[i]>=0)) {
@@ -83,10 +84,10 @@ bool DataCache::getCacheBlock(char* buffer,size_t BlockId) {
 }
 // the place for counting number of page accesses
 void DataCache::storeCacheBlock(char* buffer, size_t BlockId) {
-	int index=-1;
-    index = umap[BlockId].c_index;
+	int index = umap[BlockId].c_index;
 //	for (int i=0;i<cachesize;i++)	// search for exist block
 //		if (cache_block[i] == BlockId && lastTime[i] >= 0) {index=i;	break;}
+    if(index == -1){umap.erase(BlockId);}
 
 	for (int i=0;i<cachesize && index == -1;i++)	// search for empty block
 		if (lastTime[i]<0) {index=i;	break;}
@@ -96,6 +97,8 @@ void DataCache::storeCacheBlock(char* buffer, size_t BlockId) {
 		for (int i=0;i<cachesize;i++)
 			if (lastTime[i]<lastTime[index]) index=i;
 	}
+
+    if(cache_block[index]!=-1) umap.erase(cache_block[index]);
 
 	memcpy(cache[index],buffer,blocklength);
 	cache_block[index]=BlockId;
@@ -122,13 +125,10 @@ void DataCache::printPageAccess() {
 
 
 DistMatrix::DistMatrix(int csize, int blength, char* filePrefix){
-
     this->blocklength = blength;
     this->filePrefix = new char[100];
     strcpy(this->filePrefix, filePrefix);
     this->initDsk(csize, blength);
-
-
 }
 
 DistMatrix::~DistMatrix(){
@@ -210,7 +210,8 @@ double DistMatrix::readDist(int snid, int enid){
     size_t addr = this->findAddrByBT(snid, enid);
     bt->delroot();
     if((snid - 5) % 10000 == 0){
-        printf("umap size: %zu\n", (bt->cache->umap.size()));
+        printf("bcumap size: %zu\n", (bt->cache->umap.size()));
+        printf("dcumap size: %zu\n", (dc->umap.size()));
     }
 
 

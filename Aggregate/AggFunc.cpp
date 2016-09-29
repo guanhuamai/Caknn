@@ -1,6 +1,19 @@
 #include "AggFunc.h"
 
 
+void AggFunc::readLmrks(char* filePrefix){
+    FILE* fp = fopen(filePrefix, "r");
+    size_t snid;
+    size_t enid;
+    size_t  eid;
+    double len1;
+    double len2;
+    while(fscanf(fp, "%zu %zu %zu %lf %lf", &snid, &enid, &eid, &len1, &len2) == 4){
+        this->lmrks.push_back(Landmark(snid, enid, eid, len1, len2));
+    }
+}
+
+
 bool AggFunc::addRslts(std::vector<MovingObjItem> movingObjItems){
     this->rslts.insert(movingObjItems.begin(), movingObjItems.end());
     if(this->rslts.size() > k){
