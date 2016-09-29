@@ -104,7 +104,7 @@ void Heap::insert(HeapEntry *_he)
 		//this is why the heap size is initiated with one more place than hsize (to facilitate
 		//coding)
 	{
-		printf("heap exceeded...\n", true);
+		printf("heap exceeded...\n");
 		exit(1);
 	}
 }

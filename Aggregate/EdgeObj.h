@@ -1,13 +1,13 @@
-#include <stdlib.h>
-#include <stddef.h>
 #ifndef EDGEOBJ_H_INCLUDED
 #define EDGEOBJ_H_INCLUDED
+#include <vector>
+#include <stdlib.h>
+#include <stddef.h>
+#include "Utility.h"
+#include "DistMatrix.h"
 
 
-/*
-EdgeObj is not edge, but object adhering on edge
-
-*/
+/**EdgeObj is not edge, but object adhering on edge*/
 
 class EdgeObj {//object on edge, landmark and moving obj
 
@@ -38,5 +38,30 @@ public:
 };
 
 
+class MovingObj : public EdgeObj{
+public:
+//aggregate information:
+    size_t numReachLmrk;              //log the number of landmark reached by moving object, -1: no need to search, num_lmark: aggValue has been generated
+    double aggValue;                //aggregate value to all landmarks
+    double speed;                   //a distance that the moving obj will move at next time stamp
+    //unsigned long timestamp;        //time stamp of the moving object
 
+    std::vector<MovingObj> readMobjFromFile(char* mobjPath);
+
+};
+
+class Landmark : public EdgeObj{
+
+public:
+//aggregate information:
+    std::vector<NodeItem> ndHeap;
+    DistMatrix* dm;
+    bool *isEdgeVisit;
+
+
+    int readLmrksFromFile(char* lmrkPath);
+    double findDist(size_t nodeID);//lmrk id is in super class
+    void  writeDist(size_t nodeID, double dist);
+    double getMovObjDist(MovingObj &mobj);
+};
 #endif // EDGEOBJ_H_INCLUDED

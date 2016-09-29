@@ -210,9 +210,9 @@ void B_Tree::qry_agg(int _k1, int _k2)
 */
 //-----------------------------------------------
 
-int B_Tree::read_header(char *_buf)
+size_t B_Tree::read_header(char *_buf)
 {
-	int i = 0;
+	size_t i = 0;
 	memcpy(&root, _buf, sizeof(root));
 	i += sizeof(root);
 
@@ -224,9 +224,9 @@ int B_Tree::read_header(char *_buf)
 
 //-----------------------------------------------
 
-int B_Tree::write_header(char *_buf)
+size_t B_Tree::write_header(char *_buf)
 {
-	int i = 0;
+	size_t i = 0;
 	memcpy(_buf, &root, sizeof(root));
 	i += sizeof(root);
 

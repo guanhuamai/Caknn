@@ -21,8 +21,6 @@ bool Edge::pasteMovObjs(std::vector<MovingObj> movOjbs){
     return true;
 }
 
-
-
 bool Edge::eraseMovObjs(std::vector<MovingObj> movOjbs){
     for(size_t i = 0; i < movOjbs.size(); i++){
         std::set<size_t>::iterator itr = this->movObjsID.find(movOjbs[i].id);
@@ -33,4 +31,21 @@ bool Edge::eraseMovObjs(std::vector<MovingObj> movOjbs){
         }
     }
     return true;
+}
+
+
+
+RoadNetwork::~RoadNetwork(){
+
+    this->edgenum = 0;
+    this->nodenum = 0;
+    delete[] this->edges;
+    delete[] this->nodes;
+
+
+    int readNodesFromFile(char* nodePath);
+    int readEdgesFromFile(char* edgePath);
+
+
+
 }

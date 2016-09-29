@@ -43,19 +43,6 @@ public:
     virtual ~RoadNetwork();
 };
 
-//RoadNetwork::~RoadNetwork(){
-//
-//    this->edgenum = 0;
-//    this->nodenum = 0;
-//    delete[] this->edges;
-//    delete[] this->nodes;
-//
-//
-//    int readNodesFromFile(char* nodePath);
-//    int readEdgesFromFile(char* edgePath);
-//
-//
-//
-//}
+
 
 #endif // ROADNETWORK_H_INCLUDED

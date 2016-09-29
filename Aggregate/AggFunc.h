@@ -1,37 +1,26 @@
-
-
 #ifndef AGGFUNC_H_INCLUDED
 #define AGGFUNC_H_INCLUDED
-
 
 #include <vector>
 #include <set>
 #include <algorithm>
 #include <unordered_map>
 
-//#include "Landmark.h"
-//#include "MovingObj.h"
 #include "DistMatrix.h"
 #include "Utility.h"
 #include "RoadNetwork.h"
-
-
-
-const double pace = 200.0;
+#include "EdgeObj.h"
 
 
 class AggFunc{
-
-
 
 public:
     char* filePrefix;
     size_t k;                                          //k
     std::set< MovingObjItem > rslts;                //resul of moving object, sorted by aggregate value in decreasing order
 
-
     RoadNetwork roadnw;
-    std::unordered_map<size_t, MovingObj> movingObjs;                  //save in set, for delete and append efficiently
+    std::unordered_map<size_t, MovingObj> movingObjs;               //save in set, for delete and append efficiently
     //double radius;                                                //the update distance at each moving object update iteration
 
 
@@ -40,13 +29,9 @@ public:
     double radius;
     double pace;
 
-
-    virtual bool initRdAndLmrk(char* fileprefix);
-
 //stop consition for single update for a landmark
 //input: landmark id
     virtual bool isExpand() = 0;
-
 
 
 //moving objects's change of status
@@ -62,17 +47,39 @@ public:
 
     virtual void expandLmrkByPace(Landmark &lmrk);
     virtual bool addRslts(std::vector< MovingObjItem > movingObjItems);
-    virtual bool eraseRslts(std::vector< MovingObjItem > movingObjItems);
-    virtual double getMovObjDist(Landmark lmrk, MovingObj mobj);
 
     virtual double aggBound();//return aggregate value bound at kth results
-    virtual double aggUpdate(double aggValue, double dist);
+    virtual double aggUpdate(double aggValue, double dist) = 0;
 
 
 };
 
 
+class AggMaxFunc: public AggFunc{
+
+public:
+    double aggUpdate(double aggValue, double dist) override {
+        return aggValue > dist ? aggValue : dist;
+    }
+};
 
 
+class AggMinFunc: public AggFunc{
+
+public:
+    double aggUpdate(double aggValue, double dist) override {
+        return aggValue < dist ? aggValue : dist;
+    }
+};
+
+
+class AggSumFunc: public AggFunc{
+
+public:
+    bool isExpand() override;
+    double aggUpdate(double aggValue, double dist) override;
+
+    double lowBound(NodeItem& nItm, Landmark& lmrk);
+};
 
 #endif // AGGFUNC_H_INCLUDED

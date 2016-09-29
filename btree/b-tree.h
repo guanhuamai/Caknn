@@ -53,10 +53,10 @@ public:
 	virtual B_Entry *new_one_entry();
 	virtual B_Node *new_one_node();
 	//void qry_agg(int _k1, int _k2);
-	virtual int read_header(char *_buf);
+	virtual size_t read_header(char *_buf);
 	virtual int read_next_entry(void **_ptr, B_Entry *_d){return 1;};
 	virtual int traverse(float *_info);
-	virtual int write_header(char *_buf);
+	virtual size_t write_header(char *_buf);
 
 
 

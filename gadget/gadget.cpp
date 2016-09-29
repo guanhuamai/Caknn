@@ -471,7 +471,7 @@ Coded by Yufei Tao, 4 aug 08
 
 void error(const std::string _msg, bool _exit)
 {
-	printf(_msg.c_str());
+	printf("%s", _msg.c_str());
 
 	if (_exit)
 		exit(1);
