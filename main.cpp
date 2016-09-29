@@ -10,7 +10,7 @@ int main()
 
     DistMatrix* mt = new DistMatrix(1500000, 6000, "test");
 
-    for (int i = 0; i < 100000000; i++){
+    for (int i = 0; i < 1000000000; i++){
         mt->writeDist(i + 5, i + 6, i + 100.1);
         int query = ((double)rand() / RAND_MAX) * i;
         double dist = mt->readDist(query + 5, query + 6);

@@ -1,5 +1,5 @@
 #include "RoadNetwork.h"
-
+#include <algorithm>
 
 
 size_t Edge::getOppositeNode(size_t nid){
@@ -37,10 +37,10 @@ bool Edge::eraseMovObjs(std::vector<MovingObj> movOjbs){
 RoadNetwork::RoadNetwork(char* filePrefix){
     char* nodePath = new char[100];
     char* edgePath = new char[100];
-    strcpy(nodePath, filePrefix);
-    strcpy(edgePath, filePrefix);
-    strcat(nodePath, ".cedge");
-    strcat(edgePath, ".cnode");
+    std::strcpy(nodePath, filePrefix);
+    std::strcpy(edgePath, filePrefix);
+    std::strcat(nodePath, ".cedge");
+    std::strcat(edgePath, ".cnode");
 
     FILE* np = fopen(nodePath, "r");
     size_t nid;
@@ -48,7 +48,7 @@ RoadNetwork::RoadNetwork(char* filePrefix){
     double lat;
     fscanf(np, "%zu", &nodenum);
     this->nodes = new Node[nodenum];
-    while(fscanf(fp, "%zu %lf %lf", &nid, &lon, &lat) == 3){
+    while(fscanf(np, "%zu %lf %lf", &nid, &lon, &lat) == 3){
         this->nodes[nid].lon = lon;
         this->nodes[nid].lat = lat;
     }
@@ -61,7 +61,7 @@ RoadNetwork::RoadNetwork(char* filePrefix){
     double elen;
     fscanf(ep, "%zu", &edgenum);
     this->edges = new Edge[edgenum];
-    while(fscanf(fp, "%zu %zu %zu %lf", &eid, &snid, &enid, &elen) == 4){
+    while(fscanf(ep, "%zu %zu %zu %lf", &eid, &snid, &enid, &elen) == 4){
         this->edges[eid].snid = snid;
         this->edges[eid].enid = enid;
         this->edges[eid].edgeLen = elen;

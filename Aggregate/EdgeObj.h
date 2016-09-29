@@ -56,6 +56,11 @@ class Landmark : public EdgeObj{
 
 public:
 //aggregate information:
+
+    Landmark(): EdgeObj(){};
+    Landmark(size_t id, size_t snid, size_t enid, size_t eid, double dist2sn, double dist2en): EdgeObj(id, snid, enid, eid, dist2sn, dist2en){};
+    //Landmark(size_t snid, size_t enid, size_t eid, double dist2sn, double dist2en){};
+
     std::vector<NodeItem> ndHeap;
     DistMatrix* dm;
     bool *isEdgeVisit;

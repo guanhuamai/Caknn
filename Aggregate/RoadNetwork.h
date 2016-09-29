@@ -1,6 +1,6 @@
 #include <set>
 #include "EdgeObj.h"
-
+#include <cstring>
 
 #ifndef ROADNETWORK_H_INCLUDED
 #define ROADNETWORK_H_INCLUDED

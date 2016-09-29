@@ -1,16 +1,25 @@
 #include "AggFunc.h"
-
+#include <cstring>
 
 void AggFunc::readLmrks(char* filePrefix){
+
+    char* lmrkPath = new char[100];
+    std::strcpy(lmrkPath, filePrefix);
+    std::strcat(lmrkPath, ".lmrk");
     FILE* fp = fopen(filePrefix, "r");
     size_t snid;
     size_t enid;
     size_t  eid;
     double len1;
     double len2;
+    size_t lid = 0;
     while(fscanf(fp, "%zu %zu %zu %lf %lf", &snid, &enid, &eid, &len1, &len2) == 4){
-        this->lmrks.push_back(Landmark(snid, enid, eid, len1, len2));
+        Landmark lmrk = Landmark(lid, snid, enid, eid, len1, len2);
+        this->lmrks.push_back(lmrk);
+        lid++;
     }
+    delete[] lmrkPath;
+    fclose(fp);
 }
 
 

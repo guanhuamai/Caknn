@@ -209,10 +209,7 @@ double DistMatrix::readDist(int snid, int enid){
     bt->load_root();
     size_t addr = this->findAddrByBT(snid, enid);
     bt->delroot();
-    if((snid - 5) % 10000 == 0){
-        printf("bcumap size: %zu\n", (bt->cache->umap.size()));
-        printf("dcumap size: %zu\n", (dc->umap.size()));
-    }
+
 
 
 //    float* info = new float[3];
