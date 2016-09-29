@@ -1,8 +1,0 @@
-#ifndef AGGMINFUNC_H_INCLUDED
-#define AGGMINFUNC_H_INCLUDED
-
-#include "AggFunc.h"
-
-
-
-#endif // AGGMINFUNC_H_INCLUDED
