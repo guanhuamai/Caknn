@@ -1,5 +1,5 @@
 #include "../btree/b-tree.h"
-
+#include <unordered_map>
 #ifndef __DistMatrix
 #define __DistMatrix
 
@@ -25,6 +25,37 @@ protected:
     int INDEX_PAGE_ACCESS;
     int DATA_PAGE_ACCESS;
     int CACHE_ACCESSED;
+
+
+
+    struct BlkPos{                                  //position of block, inside of cache, use it as int, which is initialized to -1
+        public:
+        int c_index;
+        BlkPos(){
+            this->c_index = -1;
+        }
+        BlkPos(int c_index){
+            this->c_index = c_index;
+        }
+        bool operator == (const BlkPos &c_index){
+            if(c_index.c_index == this->c_index){
+                return true;
+            }
+            return false;
+        }
+        bool operator != (const BlkPos &c_index){
+            if(c_index.c_index != this->c_index){
+                return true;
+            }
+            return false;
+        }
+        BlkPos& operator = (const BlkPos &c){
+            this->c_index = c.c_index;
+            return *this;
+        }
+    };
+
+    std::unordered_map<size_t, BlkPos> umap;        //hash block id to cache position
 
 //this operation is to regulate cache in memory
 
@@ -63,7 +94,7 @@ public:
     DistMatrix(int csize, int blength, char* filePrefix);
     virtual ~DistMatrix();
     virtual size_t writeDist(int snid, int enid, double dist);
-    virtual double readDist(int snid, int enid);
+    virtual double readDist (int snid, int enid);
 
 };
 

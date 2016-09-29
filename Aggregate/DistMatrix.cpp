@@ -35,6 +35,8 @@ void DataCache::InitCache(int csize, int blength) {
 		cache_block[i]=-1;
 		cache[i] = new char[blocklength];
 	}
+
+	umap.clear();
 }
 
 void DataCache::RefreshStat() {
@@ -64,20 +66,27 @@ void DataCache::DestroyCache() {
 
 bool DataCache::getCacheBlock(char* buffer,size_t BlockId) {
 	CACHE_ACCESSED++;
-	for (int i=0;i<cachesize;i++)
-		if ((cache_block[i]==BlockId)&&
-			(lastTime[i]>=0)) {
-				memcpy(buffer,cache[i],blocklength);
-				lastTime[i]=nextTime++;
-				return true;
-			}
+    int c_index = umap[BlockId].c_index;
+    if(cache_block[c_index] == BlockId && (lastTime[c_index] >= 0)){
+        memcpy(buffer,cache[c_index],blocklength);
+        lastTime[c_index]=nextTime++;
+        return true;
+    }
+//	for (int i=0;i<cachesize;i++)
+//		if ((cache_block[i]==BlockId)&&
+//			(lastTime[i]>=0)) {
+//            memcpy(buffer,cache[i],blocklength);
+//            lastTime[i]=nextTime++;
+//            return true;
+//        }
 	return false;
 }
 // the place for counting number of page accesses
 void DataCache::storeCacheBlock(char* buffer, size_t BlockId) {
 	int index=-1;
-	for (int i=0;i<cachesize;i++)	// search for exist block
-		if (cache_block[i] == BlockId && lastTime[i] >= 0) {index=i;	break;}
+    index = umap[BlockId].c_index;
+//	for (int i=0;i<cachesize;i++)	// search for exist block
+//		if (cache_block[i] == BlockId && lastTime[i] >= 0) {index=i;	break;}
 
 	for (int i=0;i<cachesize && index == -1;i++)	// search for empty block
 		if (lastTime[i]<0) {index=i;	break;}
@@ -90,6 +99,7 @@ void DataCache::storeCacheBlock(char* buffer, size_t BlockId) {
 
 	memcpy(cache[index],buffer,blocklength);
 	cache_block[index]=BlockId;
+	umap[BlockId]=index;
 	lastTime[index]=nextTime++;
 
 
