@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <sstream>
 #include <vector>
 #include <fstream>
@@ -76,7 +75,8 @@ void sdb(SDB* sdb, vector<int> old, vector<int> newI, vector<int> newE, vector<d
     for (size_t i = 0; i < no; i++) {
         double rold = sdb->r;
         sdb->update(old[i], -1, DBL_MAX);
-        if (sdb->r > rold) sdb->expand();
+        if ((rold == DBL_MAX && sdb->r != DBL_MAX) || sdb->r > rold) sdb->expand();
+        else printf("no expanding old radius: %lf, new radius %lf\n", rold, sdb->r);
     }
     for (size_t i = 0; i < nn; i++){
         double rold = sdb->r;
@@ -102,16 +102,36 @@ int main()
     lmrks.push_back(pair<int, double>(4, 2.0));
 
     function<double (double, double)> aggfunc = aggsum;
-    SLE* sle = new SLE(2, g, lmrks, aggfunc);
+//    SLE* sle = new SLE(4, g, lmrks, aggfunc);
     vector<int> mobjI = {0, 1, 2, 3, 4};
     vector<int> mobjE = {3, 6, 5, 7, 1};
     vector<double > mobjPos = {3.0, 2.0, 3.0, 3.0, 3.0};
 
-    sdb(sle, vector<int>(), mobjI, mobjE, mobjPos);
-    sdb(sle, vector<int>{0}, vector<int>{}, vector<int>{}, vector<double >{});
-    sdb(sle, vector<int>{1}, vector<int>{}, vector<int>{}, vector<double >{});
-    sdb(sle, vector<int>{2}, vector<int>{}, vector<int>{}, vector<double >{});
-    sdb(sle, vector<int>{3}, vector<int>{}, vector<int>{}, vector<double >{});
-    sdb(sle, vector<int>{4}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(sle, vector<int>(), mobjI, mobjE, mobjPos);
+//    sdb(sle, vector<int>{0}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(sle, vector<int>{1}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(sle, vector<int>{2}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(sle, vector<int>{3}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(sle, vector<int>{4}, vector<int>{}, vector<int>{}, vector<double >{});
+
+
+//    ILE_MIN* ile_min = new ILE_MIN(4, g, lmrks, aggfunc);
+//
+//    sdb(ile_min, vector<int>(), mobjI, mobjE, mobjPos);
+//    sdb(ile_min, vector<int>{0}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(ile_min, vector<int>{1}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(ile_min, vector<int>{2}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(ile_min, vector<int>{3}, vector<int>{}, vector<int>{}, vector<double >{});
+//    sdb(ile_min, vector<int>{4}, vector<int>{}, vector<int>{}, vector<double >{});
+
+
+    ILE_SUM* ile_sum = new ILE_SUM(4, g, lmrks, aggfunc);
+
+    sdb(ile_sum, vector<int>(), mobjI, mobjE, mobjPos);
+    sdb(ile_sum, vector<int>{0}, vector<int>{}, vector<int>{}, vector<double >{});
+    sdb(ile_sum, vector<int>{1}, vector<int>{}, vector<int>{}, vector<double >{});
+    sdb(ile_sum, vector<int>{2}, vector<int>{}, vector<int>{}, vector<double >{});
+    sdb(ile_sum, vector<int>{3}, vector<int>{}, vector<int>{}, vector<double >{});
+    sdb(ile_sum, vector<int>{4}, vector<int>{}, vector<int>{}, vector<double >{});
     return 0;
 }

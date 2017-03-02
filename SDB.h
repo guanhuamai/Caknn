@@ -14,7 +14,6 @@ using namespace std;
 
 bool cmpResult(pair<int, double>& a, pair<int, double>& b){return a.second < b.second;}
 
-
 class SDB{
 public:
     Graph G;  // the graph
@@ -48,7 +47,6 @@ public:
     };
 
     //--------------------- important method below------------------------
-
     SDB(){}
 
     SDB(size_t k, Graph g, vector<pair<int, double>> lmrks,
@@ -60,7 +58,6 @@ public:
     }
 
     virtual double velocity();
-
     // distance from lid to point
     virtual double getDist(int lid, int eid, double pos);
 
@@ -75,7 +72,6 @@ public:
     virtual void updateOpf(int mid, int eid, double pos);  // update potential objects
 
     //--------------------trivial method below-----------------
-
     void findLoc (int id, size_t& s, vector<pair<int, double>>& v){
         while (s < v.size() && v[s].first != id) s++;
     }
@@ -110,10 +106,8 @@ public:
 
     void insertP(DistEle de, vector<DistEle>& h){h.push_back(de), make_heap(h.begin(),h.end());}
 
-    DistEle popP(vector<DistEle>& h) {pop_heap(h.begin(), h.end()); DistEle res = h.back(); h.pop_back(); return res;}
+    DistEle popP(vector<DistEle>& h) {pop_heap(h.begin(),h.end());DistEle res = h.back();h.pop_back();return res;}
 };
-
-
 
 void SDB::updateOpf(int mid, int eid, double pos){  // update potential objects
     if (eid == -1) return;  // return if it has a delete mark
@@ -237,7 +231,6 @@ void SDB::update(int mid, int eid, double pos){  // input the new information of
 }
 
 double SDB::velocity(){return 10.0;}
-
 // return the distance to the landmark by matrix
 double SDB::getDist(int lid, int eid, double pos){
     if (eid == -1) return DBL_MAX;
@@ -262,6 +255,4 @@ double SDB::getAggDist(int eid, double pos){
     }
     return aggV;
 }
-
 #endif
-
