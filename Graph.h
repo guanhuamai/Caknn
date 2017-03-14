@@ -23,10 +23,13 @@ class Node{
 
 public:
     int nid;
+    double x;
+    double y;
     vector<int> adjNodes;
     vector<int> adjEdges;
     Node(): nid(0){}
     Node(int i): nid(i){}
+    Node(int i, double x, double y): nid(i), x(x), y(y){}
 };
 
 

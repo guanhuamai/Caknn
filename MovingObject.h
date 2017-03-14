@@ -12,19 +12,19 @@
 using namespace std;
 using namespace qdbm;
 
-const char* DBNAME = "bpt.mobj";
+
+Villa* vl;
 
 class MovingObject{  // moving object during the query, not the whole moving objects
 
     static unordered_map<int, unordered_set<int>> hsObj;
 
     static pair<int, double > read(int key) {
-        Villa vl(DBNAME, Villa::OWRITER);
         char *v = NULL;
         pair<int, double> p;
 
         try {
-            v = vl.get((const char *) &key, sizeof(int), NULL);
+            v = vl->get((const char *) &key, sizeof(int), NULL);
 
             memcpy(&p.first, v, sizeof(int));
             memcpy(&p.second, v + sizeof(int), sizeof(double));
@@ -35,12 +35,10 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         }
 
         if (v!=NULL) free(v);
-        vl.close();
         return p;
     }
 
     static void write(int pid, int eid, double pos) {
-        Villa vl(DBNAME, Villa::OWRITER | Villa::OCREAT);
         char* k = new char[100];
         char* v = new char[100];
 
@@ -49,29 +47,30 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         memcpy(v + sizeof(int), &pos, sizeof(double));
 
         try {
-            vl.put(k, sizeof(int), v, sizeof(int) + sizeof(double), Villa::DOVER);
+            vl->put(k, sizeof(int), v, sizeof(int) + sizeof(double), Villa::DOVER);
         }catch (Villa_error& e) { throw e; }
 
         free(k);
         free(v);
-        vl.close();
     }
 
     static void erase(int pid){
-        Villa vl(DBNAME, Villa::OWRITER);
         char* k = new char[100];
         memcpy(k, &pid, sizeof(int));
         try{
-            vl.out(k, sizeof(int));
+            vl->out(k, sizeof(int));
         }catch (Villa_error& e){
             if (e.code() != Villa::ENOITEM) throw e;
             else printf("delete item with key %d failed, not found\n", pid);
         }
         free(k);
-        vl.close();
     }
 
 public:
+
+    static void closeDB(){vl->close();}
+
+    static void setDB(const char* DBNAME){vl = new Villa(DBNAME, Villa::OCREAT | Villa::OWRITER);}
 
     static void insertP(int pid, int eid, double pos){
         if(hsObj.find(eid) == hsObj.end())
