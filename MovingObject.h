@@ -1,6 +1,9 @@
 #ifndef __MOVINGOBJECT
 #define __MOVINGOBJECT
 
+#include <algorithm>
+#include <limits.h>
+#include <float.h>
 #include <xvilla.h>
 #include <cstdlib>
 #include <cstring>
@@ -21,7 +24,7 @@ class MovingObject{  // moving object during the query, not the whole moving obj
 
     static pair<int, double > read(int key) {
         char *v = NULL;
-        pair<int, double> p;
+        pair<int, double> p = pair<int, double>(INT_MAX, DBL_MAX);
 
         try {
             v = vl->get((const char *) &key, sizeof(int), NULL);
@@ -31,7 +34,7 @@ class MovingObject{  // moving object during the query, not the whole moving obj
 
         }catch (Villa_error& e) {
             if (e.code() != Villa::ENOITEM) throw e;
-            else printf("item not found\n");
+//            else printf("item not found\n");
         }
 
         if (v!=NULL) free(v);
@@ -66,6 +69,8 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         free(k);
     }
 
+    MovingObject(){}  // ban initialization
+
 public:
 
     static void closeDB(){vl->close();}
@@ -73,6 +78,7 @@ public:
     static void setDB(const char* DBNAME){vl = new Villa(DBNAME, Villa::OCREAT | Villa::OWRITER);}
 
     static void insertP(int pid, int eid, double pos){
+//        printf("insert %d\n", pid);
         if(hsObj.find(eid) == hsObj.end())
             hsObj[eid] = unordered_set<int>();  // initialize the set
         hsObj[eid].insert(pid);
@@ -88,7 +94,18 @@ public:
         return res;
     }
 
-    static void eraseP(int pid) {  hsObj[read(pid).first].erase(pid), erase(pid); }
+    static void eraseP(int pid) {
+//        printf("erase %d\n", pid);
+        pair<int, double > p = read(pid);
+        if (p.first != INT_MAX) hsObj[read(pid).first].erase(pid), erase(pid);
+//        else printf("erase failed\n");
+    }
+
+    static void updateP(int pid, int eid, double pos){
+        eraseP(pid);
+        if (eid != -1) insertP(pid, eid, pos);
+    }
+
 };
 
 unordered_map<int, unordered_set<int>> MovingObject::hsObj = unordered_map<int, unordered_set<int>>();

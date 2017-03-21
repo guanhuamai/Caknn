@@ -6,28 +6,25 @@
 #include <bitset>
 #include <unordered_set>
 #include <unordered_map>
+#include <queue>
+
 
 #include "Graph.h"
 #include "functional"
 #include "MovingObject.h"
 using namespace std;
 
-bool cmpResult(pair<int, double>& a, pair<int, double>& b){return a.second < b.second;}
+bool cmpResult(pair<int, double>& a, pair<int, double>& b) {return a.second < b.second;}
+
+struct OPFLess{bool operator () (pair<int, double >& a, pair<int, double>& b) const { return a.second < b.second;}};
 
 class SDB{
 public:
-    Graph G;  // the graph
-
-    int nl;  // number of landmarks
-    unordered_map<int, vector<int>> hsLmrk;  // landmark hash key: eid, val: lmid
-    vector<pair<int, double>> lmrks;  // landmarks   pair: 1st
-
     unordered_map<bitset<64>, double> m; // partial distance matrix M, key: 32int + 32int
 
     function<double(double, double)> agg;
 
     double r;  // safe distance
-    unordered_set<int> opf;  // moving objects id inside of the safe region, or protential future objects
 
     double dk;  // always point to kth dist
     vector<pair<int, double>> res;  //result.
@@ -72,15 +69,15 @@ public:
     virtual void updateOpf(int mid, int eid, double pos);  // update potential objects
 
     //--------------------trivial method below-----------------
-    void findLoc (int id, size_t& s, vector<pair<int, double>>& v){
-        while (s < v.size() && v[s].first != id) s++;
-    }
-
     void resMkHeap(){
         make_heap(res.begin(), res.end(), cmpResult);
-        if (res.size() == k) dk = res[0].second, r = dk + velocity(), printf("update radius: %lf\n", r);
-        else if (res.size() < k) dk = DBL_MAX, r = DBL_MAX;
-        else printf("res size should not larger than k, get %zu\n", res.size());
+        if (res.size() < k)  dk = DBL_MAX, r = DBL_MAX;
+        else{
+            if (res.size() > k) res.resize(k);
+            dk = res[0].second;
+            double newD = dk + velocity();
+            if (r == DBL_MAX || r < newD)r = newD; // printf("update radius: %lf\n", r);
+        }
     }
 
     pair<int, double> findMinCand(){  // use brute force
@@ -93,20 +90,12 @@ public:
         return r;
     }
 
-    void replaceV(vector<pair<int, double>>& v, int i, pair<int, double> p){
-        swap(v[i], v[v.size() - 1]), v.pop_back();
-        v.push_back(p);
-    }
-
-    void eraseV(vector<pair<int, double>>& v, int i){swap(v[i], v[v.size() - 1]), v.pop_back();}
-
-    bitset<64> getKey(int nid, int lid){bitset<64> k(nid); k = k<<32, k|=lid;  return k;}
-
     void insertM(int nid, int lid, double d){ bitset<64> k = getKey(nid, lid); m[k] = d;}
 
     void insertP(DistEle de, vector<DistEle>& h){h.push_back(de), make_heap(h.begin(),h.end());}
 
     DistEle popP(vector<DistEle>& h) {pop_heap(h.begin(),h.end());DistEle res = h.back();h.pop_back();return res;}
+
 };
 
 void SDB::updateOpf(int mid, int eid, double pos){  // update potential objects
@@ -171,63 +160,46 @@ void SDB::forceUpdate(int mid, int eid, double pos) { // using dijkstra to updat
             aggV = agg(p.dist, aggV);
         }
     }
+    opf.insert(mid);
     res.push_back(pair<int, double>(mid, aggV));
     resMkHeap();
-
-    MovingObject::insertP(mid, eid, pos);
 }
 
-void SDB::update(int mid, int eid, double pos){  // input the new information of the point
-    if (eid != -1 && dk == DBL_MAX){ forceUpdate(mid, eid, pos); return;}  // not a deleted moving object...
+
+void SDB::update(int mid, int eid, double pos) {  // input the new information of the point
+
+    pair<int, double > oldPair = MovingObject::getP(mid);
+
+    if (oldPair.second != DBL_MAX)
+        double dold = getAggDist(oldPair.first, oldPair.second);
+
+    MovingObject::updateP(mid, eid, pos);  // update in moving object database unconditionally...
+
+    if (eid != -1 && dk == DBL_MAX) {  // not a deleted moving object...
+        forceUpdate(mid, eid, pos);
+        return;
+    }
 
     double di = getAggDist(eid, pos);
 
     size_t loc(0);
     findLoc(mid, loc, res);
 
-    if (di <= r && eid != -1){
-        if (di < dk){ // case i
+    if (di < r)  opf.insert(mid);  // update opf according to new aggregate distance
+    else  opf.erase(mid);
 
-            if (loc != res.size()) res[loc].second = di;
-            else replaceV(res, 0, pair<int, double>(mid, di));
-
-            resMkHeap();
-
-        }else{ // case ii
-
-            if (loc == res.size()){  //can't find mid
-                if (opf.find(mid) == opf.end())
-                    opf.insert(mid), MovingObject::insertP(mid, eid, pos);
-
-            }else {
-                pair<int, double> cand = findMinCand();
-                if (cand.second < di) replaceV(res, loc, cand);
-
-                resMkHeap();
-            }
+    if ((opf.size() < k && (di < dk || loc != res.size()))){  // update res from opf
+        res.clear();
+        res.resize(opf.size());
+        int i = 0;
+        for (const auto& e: opf){
+            pair<int, double> pi = MovingObject::getP(e);
+            double tmpdi = getAggDist(pi.first, pi.second);
+            res[i++] = pair<int, double >(e, tmpdi);
         }
-    }else{  // case iii
-
-        if (loc != res.size()){
-            pair<int, double> cand = findMinCand();  // find the object in opf with minimum aggregate value.
-
-            if (cand.second != DBL_MAX) {
-
-                replaceV(res, loc, cand);
-
-                opf.erase(cand.first);  // erase the newly selected moving object from opf
-
-            }else eraseV(res, loc);
-
-            resMkHeap();
-        }
-
-        updateOpf(mid, eid, pos);
-
-        if(eid == -1) MovingObject::eraseP(mid);  // the moving object is marked to be deleted
-
-        else MovingObject::insertP(mid, eid, pos);  // replace the new position or insert the moving object
+        resMkHeap();
     }
+
 }
 
 double SDB::velocity(){return 10.0;}

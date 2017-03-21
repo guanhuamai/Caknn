@@ -116,17 +116,16 @@ void SLE::expand(function<bool (int, int)> isVisit, function<void (int, int)> vi
         vector<int>& adjN = G.nodes[p.oid].adjNodes;
         vector<int>& adjE = G.nodes[p.oid].adjEdges;
 
-        for (int i = 0; i < (int)adjN.size(); i++){
+        for (int i = 0; i < (int)adjN.size(); i++){  // next search
             if (isVisit(p.lid, adjN[i])) continue; // if found skip...
             insertP(DistEle(adjN[i], p.lid, p.dist + G.edges[adjE[i]].len), h);
         }
 
+        // update opf from adjacent node, these objects are only stored in disk
         for (int i = 0; i < (int)adjE.size(); i++){
             vector<pair<int, pair<int, double >>> mobjs = MovingObject::getPFromE(adjE[i]);
             for (const auto& mobj : mobjs) updateOpf(mobj.first, mobj.second.first, mobj.second.second);
         }
-
-        for (int i = 0; i < res.size(); i++){ if (opf.find(res[i].first) != opf.end()) opf.erase(res[i].first); }
     }
 }
 

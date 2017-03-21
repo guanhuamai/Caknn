@@ -3,7 +3,7 @@ project(CaknnSR)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp Utility.h)
 
 LINK_DIRECTORIES(/usr/local/lib)
 add_executable(CaknnSR ${SOURCE_FILES})

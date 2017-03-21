@@ -2,50 +2,11 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
-
+#include <chrono>
 #include "Expansion.h"
 using namespace std;
 
-template<typename Out>
-void split(const std::string &s, char delim, Out result) {
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        *(result++) = item;
-    }
-}
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-
-vector<string> readLines(string fname){
-    string line;
-    ifstream myfile (fname.c_str());
-    vector<string> res;
-    if (myfile.is_open())
-        {
-            while ( getline (myfile,line)) res.push_back(line);
-            myfile.close();
-        }
-    else cout << "Unable to open file" << endl;
-    return res;
-}
-
-
-int my_stoi(string s){istringstream iss(s); int res; iss >> res; return res;}
-
-double my_stof(string s){istringstream iss(s); double res; iss >> res; return res;}
-
-double euclidDist(const double& x1, const double& y1, const double& x2, const double& y2){
-    double dx = x1 - x2;
-    double dy = y1 - y2;
-    return sqrt(dx * dx + dy * dy);
-}
-
-void readMovObj(ifstream& mfile, vector<int>& old,
+bool readMovObj(ifstream& mfile, vector<int>& old,
                 vector<int>& newI, vector<int>& newE, vector<double>& newP,
                 string& line,
                 Graph& g){
@@ -53,13 +14,18 @@ void readMovObj(ifstream& mfile, vector<int>& old,
     newI.clear(), old.clear(), newE.clear(), newP.clear();
 
     int round = -1;
+
+    if (line == "") getline(mfile, line);
+
+    if (line == "") return false;  // when the line is "" return false to finish checking...
+
     if (mfile.is_open()){
-        while (line != "" || getline(mfile, line)){
+        while (line != ""){
             vector<string> splitStr = split(line, '\t');
 
             int tmpround = my_stoi(splitStr[4]);
 
-            if (tmpround != round && round != -1) break;
+            if (tmpround != round && round != -1) return true;
 
             round = tmpround;
 
@@ -68,7 +34,7 @@ void readMovObj(ifstream& mfile, vector<int>& old,
 
             if (snid > enid) swap(snid, enid);
 
-            if (splitStr[0] == "point" || splitStr[0] == "disappearpoint")  old.push_back(oid);
+            if (splitStr[0] == "disappearpoint")  old.push_back(oid);
 
             newI.push_back(oid);
 
@@ -82,8 +48,11 @@ void readMovObj(ifstream& mfile, vector<int>& old,
             }
 
             newP.push_back(euclidDist(g.nodes[snid].x, g.nodes[snid].y, x, y));
+
+            getline(mfile, line);
         }
     }
+    return true;
 }
 
 Graph construct(string nodeF, string edgeF){
@@ -133,14 +102,6 @@ vector<pair<int, double>> construct(string lmrkF){
     return res;
 }
 
-double aggmin(double a, double b){ return min(a, b);}
-
-double aggmax(double a, double b){ return max(a, b);}
-
-double aggsum(double a, double b){
-    if (a != DBL_MAX && b != DBL_MAX) return a + b;
-    else return DBL_MAX;
-}
 
 
 void sdb(SDB* sdb, vector<int> old, vector<int> newI, vector<int> newE, vector<double> newP){
@@ -148,34 +109,37 @@ void sdb(SDB* sdb, vector<int> old, vector<int> newI, vector<int> newE, vector<d
     for (size_t i = 0; i < no; i++) {
         double rold = sdb->r;
         sdb->update(old[i], -1, DBL_MAX);
-        if ((rold == DBL_MAX && sdb->r != DBL_MAX) || sdb->r > rold) sdb->expand();
-        else printf("no expanding old radius: %lf, new radius %lf\n", rold, sdb->r);
+        if ((rold == DBL_MAX && sdb->r != DBL_MAX) || sdb->r > rold) printf("expand\n"), sdb->expand();
+//        else printf("no expanding old radius: %lf, new radius %lf\n", rold, sdb->r);
     }
     for (size_t i = 0; i < nn; i++){
         double rold = sdb->r;
         sdb->update(newI[i], newE[i], newP[i]);
-        if ((rold == DBL_MAX && sdb->r != DBL_MAX) || sdb->r > rold) sdb->expand();
-        else printf("no expanding old radius: %lf, new radius %lf\n", rold, sdb->r);
+        if ((rold == DBL_MAX && sdb->r != DBL_MAX) || sdb->r > rold)  printf("expand\n"), sdb->expand();
+//        else printf("no expanding old radius: %lf, new radius %lf\n", rold, sdb->r);
     }
-    printf("---------------the result ------------\n");
-    for (size_t i = 0; i < sdb->res.size(); i++){
-        pair<int, double >& res = sdb->res[i];
-        printf("%d %lf\n", res.first, res.second);
-    }
+//    printf("---------------the result ------------\n");
+//    for (size_t i = 0; i < sdb->res.size(); i++){
+//        pair<int, double >& res = sdb->res[i];
+//        printf("%d %lf\n", res.first, res.second);
+//    }
 }
 
 void doExperiment(const char* path, const char* dataName,
                   int numLmrks, int numObj, int k, int objSpeed, int numQueries){
-    stringstream nodePath(path), edgePath(path), lmrkPath(path), movObjPath(path);
-    nodePath << dataName << ".cnode";
-    edgePath << dataName << ".cedge";
-    lmrkPath << dataName << ".lmrk";
-    movObjPath << dataName << "." << to_string(numObj).c_str()
+    stringstream nodePath, edgePath, lmrkPath, movObjPath;
+    nodePath << path << dataName << ".cnode";
+    edgePath << path << dataName << ".cedge";
+    lmrkPath << path << dataName << ".lmrk";
+    movObjPath << path << dataName << "." << to_string(numObj).c_str()
                << "." <<  to_string(objSpeed).c_str() << ".mobj";
+
+    const char* DBNAME = "bt.mobj";
+    MovingObject::setDB(DBNAME);
 
     Graph g = construct(nodePath.str(), edgePath.str());
     vector<pair<int, double>> lmrks = construct(lmrkPath.str());
-    lmrks.reserve((unsigned)numLmrks);
+    lmrks.resize((unsigned)numLmrks);
 
     ifstream mfile(movObjPath.str().c_str());
 
@@ -187,8 +151,8 @@ void doExperiment(const char* path, const char* dataName,
     function<double (double, double)> aggfunc = aggsum;
     SLE* sle = new SLE((unsigned) k, g, lmrks, aggfunc);
 
-    while (mobjI.size() != 0) {
-        readMovObj(mfile, old, mobjI, mobjE, mobjPos, line, g);
+    while (readMovObj(mfile, old, mobjI, mobjE, mobjPos, line, g)) {
+        printf("things are %zu %zu %zu %zu\n", old.size(), mobjI.size(), mobjE.size(), mobjPos.size());
         sdb(sle, old, mobjI, mobjE, mobjPos);
     }
 
@@ -197,8 +161,12 @@ void doExperiment(const char* path, const char* dataName,
 
 int main()
 {
-    doExperiment("/home/mgh/codes/C++/CaknnSR/data/", "alaska", 1, 500000, 3, 50, 50000);
-
+    chrono::time_point<chrono::system_clock> strt, end;
+    strt = chrono::system_clock::now();
+    doExperiment("/home/mgh/codes/C++/CaknnSR/data/", "alaska", 1, 50000, 3, 50, 50000);
+    end  = chrono::system_clock::now();
+    chrono::duration<double > elapsed = end - strt;
+    cout << "throughput: " << 2507598.0 / elapsed.count() / 20 << endl;
 //    Graph g = construct("/home/mgh/codes/C++/CaknnSR/data/alaska.cnode",
 //                        "/home/mgh/codes/C++/CaknnSR/data/alaska.cedge");
 //
