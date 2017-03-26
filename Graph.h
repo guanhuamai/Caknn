@@ -18,7 +18,7 @@ using namespace std;
 class Graph{ // singleton
 
     // can't be modified without graphFactory
-    class Edge{
+    struct Edge{
         int eid;
         double len;
         int snid;
@@ -28,7 +28,7 @@ class Graph{ // singleton
         Edge(): eid(0), len(0), snid(0), enid(0){}
     };
 
-    class Node{
+    struct Node{
         int nid;
         double x;
         double y;
@@ -55,8 +55,6 @@ class Graph{ // singleton
 
 public:
 
-    ~Graph(){if (graph != NULL) delete(graph); graph = NULL;}
-
     //static constructor
     static void graphFactory(string nodeF, string edgeF){
 
@@ -66,13 +64,13 @@ public:
         graph = new Graph();
         vector<string> nodeStr = Utility::readLines(nodeF);
         vector<string> edgeStr = Utility::readLines(edgeF);
-        int n(my_stoi(nodeStr[0])), m(Utility::my_stoi(edgeStr[0]));
+        int n(Utility::my_stoi(nodeStr[0])), m(Utility::my_stoi(edgeStr[0]));
         for (int i = 1; i <= n; i++){
             vector<string> splitStr = Utility::split(nodeStr[i], '\t');
             graph->nodes.push_back(
-                    Node(Utility::my_stoi(Utility::splitStr[0]),
-                         Utility::my_stof(Utility::splitStr[1]),
-                         Utility::my_stof(Utility::splitStr[2])));
+                    Node(Utility::my_stoi(splitStr[0]),
+                         Utility::my_stof(splitStr[1]),
+                         Utility::my_stof(splitStr[2])));
         }
 
         for (int i = 1; i <= m; i++){
@@ -95,9 +93,9 @@ public:
 
     //static visit
     static vector<int> getNeighbors(int nid) {
-        if (nid < 0 || nid >= nodes.size()) return NULL;
-        vector<int> graph = nodes[nid].adjNodes;
-        return graph;
+        if (nid < 0 || nid >= graph->nodes.size()) return vector<int>();
+        vector<int> res = graph->nodes[nid].adjNodes;
+        return res;
     };
 
     static vector<int> getAdjacentEdge(int nid){
@@ -115,34 +113,34 @@ public:
     }
 
     static int getEdgeStart(int eid){
-        if (eid < 0 || eid >= edges.size()) return -1;
-        return edges[eid].snid;
+        if (eid < 0 || eid >= graph->edges.size()) return -1;
+        return graph->edges[eid].snid;
     }
 
     static int getEdgeEnd(int eid){
-        if (eid < 0 || eid >= edges.size()) return -1;
-        return edges[eid].enid;
+        if (eid < 0 || eid >= graph->edges.size()) return -1;
+        return graph->edges[eid].enid;
     }
 
     static double getEdgeLen(int eid){
-        if (eid < 0 || eid >= edges.size()) return -1;
-        return edges[eid].len;
+        if (eid < 0 || eid >= graph->edges.size()) return -1;
+        return graph->edges[eid].len;
     }
 
     static pair<double, double > getNodeCoordinates(int nid){
-        if (nid < 0 || nid >= nodes.size())
+        if (nid < 0 || nid >= graph->nodes.size())
             return pair<double, double >(DBL_MAX, DBL_MAX);
-        return pair<int, int>(graph->nodes[i].x, graph->nodes[i].y);
+        return pair<int, int>(graph->nodes[nid].x, graph->nodes[nid].y);
     };
 
     static void initLmrks(vector<pair<int, double >>& lmrks){
         graph->lmrks = lmrks;
         graph->hsLmrk.clear();
         for (int i = 0; i < lmrks.size(); i++){
-            if (graph->hsLmrk.find(lmrk.first) == graph->hsLmrk.end()){
-                graph->hsLmrk[lmrk.first] = vector<int>();
+            if (graph->hsLmrk.find(i) == graph->hsLmrk.end()){
+                graph->hsLmrk[i] = vector<int>();
             }
-            graph->hsLmrk[lmrk.first].push_back(i);
+            graph->hsLmrk[i].push_back(i);
         }
     }
 
@@ -159,9 +157,11 @@ public:
     }
 };
 
+bool Graph::isInit = false;
+Graph* Graph::graph = NULL;
 
-Graph::graph = NULL;
-Graph::isInit = false;
+//Graph::graph = NULL;
+//Graph::isInit = false;
 
 #endif // __GRAPH
 

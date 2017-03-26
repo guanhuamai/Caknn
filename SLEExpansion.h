@@ -23,10 +23,11 @@ class SLEExpansion : public BaseExpansion{
 private:
     DistElements distElements;
 
-    vector<unordered_set<pair<int, ElemType >>> visited;  // visited[i]: (0, N - 1): node;
+    vector<ElementSet> visited;  // visited[i]: (0, N - 1): node;
 
     bool isVisit(int frm, pair<int, ElemType> to){
-        return visited[frm].find(to) != visited[frm].end(); }
+        if (frm >= visited.size())  cout << "illegal landmark id triggered" << endl;
+        return visited[frm].isExist(to); }
 
     void visit(int frm, pair<int, ElemType> to){
         visited[frm].insert(to);
@@ -34,10 +35,14 @@ private:
 
 public:
 
-    unordered_set<pair<int, pair<int, double >>> expand(double r);
+    SLEExpansion(unsigned int numLmrks){ visited = vector<ElementSet>(numLmrks, ElementSet());}
+
+    vector<pair<int, pair<int, double >>> expand(double r);
 };
 
-unordered_set<pair<int, pair<int, double >>> SLEExpansion::expand(double r){
+vector<pair<int, pair<int, double >>> SLEExpansion::expand(double r){
+    if (r == DBL_MAX)
+        return vector<pair<int, pair<int, double >>>();
 
     if (!isVisit(0, pair<int, ElemType >(0, NODE)) && distElements.empty()){  // the search is not began
         for (int i = 0; i < Graph::getNumLmrks(); i++){
@@ -53,7 +58,7 @@ unordered_set<pair<int, pair<int, double >>> SLEExpansion::expand(double r){
         }
     }
 
-    unordered_set<pair<int, pair<int, double >>> expandedOpf;
+    vector<pair<int, pair<int, double >>> expandedOpf;
 
     while(!distElements.empty()){
 
@@ -87,7 +92,7 @@ unordered_set<pair<int, pair<int, double >>> SLEExpansion::expand(double r){
         for (int i = 0; i < (int)adjE.size(); i++){
             vector<pair<int, pair<int, double >>> mobjs = MovingObject::getPFromE(adjE[i]);
             for (const auto& mobj : mobjs)
-                expandedOpf.insert(mobj);
+                expandedOpf.push_back(mobj);
         }
     }
     return expandedOpf;

@@ -57,4 +57,6 @@ public:
     }
 };
 
+PartialMatrix* PartialMatrix::pm = NULL;
+
 #endif //CAKNNSR_PARTIALMATRIX_H

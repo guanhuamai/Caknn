@@ -30,9 +30,9 @@ public:
         cout << "not implemented visit function called";
     }
 
-    virtual unordered_set<pair<int, pair<int, double >>> expand(double r){
+    virtual vector<pair<int, pair<int, double >>> expand(double r){
         cout << "not implemented expand function called";
-        return  unordered_set<pair<int, pair<int, double >>>();
+        return  vector<pair<int, pair<int, double >>>();
     }
 
 };

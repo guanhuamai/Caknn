@@ -38,7 +38,7 @@ private:
 
 public:
 
-    static const pair<int, double > USE_LESS_PAIR = pair<int, double>(INT8_MAX, DBL_MAX);
+    static pair<int, double > USE_LESS_PAIR;
 
     static void buildOpf(){opfPtr = new Opf();}
 
@@ -51,7 +51,7 @@ public:
         while (!opfPtr->heapOpf.empty()){
             if (opfPtr->opf.find(opfPtr->heapOpf.top().first) == opfPtr->opf.end())
                 opfPtr->heapOpf.pop();
-            return pair<int, double >(opfPtr->heapOpf.top().first, opfPtr->heapOpf.top().second);
+            else return pair<int, double >(opfPtr->heapOpf.top().first, opfPtr->heapOpf.top().second);
         }
 
         return USE_LESS_PAIR;
@@ -65,5 +65,9 @@ public:
         return opfPtr->opf.find(mid) == opfPtr->opf.end();
     }
 };
+
+Opf* Opf::opfPtr = NULL;
+
+pair<int, double> Opf::USE_LESS_PAIR = pair<int, double>(INT_MAX, DBL_MAX);
 
 #endif //CAKNNSR_OPF_H

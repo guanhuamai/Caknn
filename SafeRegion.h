@@ -20,7 +20,7 @@ using namespace std;
 class SafeRegion{
 
 private:
-    SafeRegion(){}
+    SafeRegion(){r = DBL_MAX; dk = DBL_MAX;}
 
     double r;
     double dk;
@@ -29,16 +29,13 @@ private:
 
     function<double (double, double)> agg;
 
-
-
-    static SafeRegion* sr;
-
     static void forceUpdate(int mid, int eid, double pos);
     static double velocity();
     static double getAggDist(int eid, double pos);
 
-
 public:
+
+    static SafeRegion* sr;
 
     static void buildSafeRegion(string nodeF, string edgeF,
                                 vector<pair<int, double>>& lmrks,
@@ -61,7 +58,7 @@ public:
     static void update(int mid, int eid, double pos);
 
     static void expand(BaseExpansion* expansion){
-        unordered_set<pair<int, pair<int, double >>> mobjs = expansion->expand(sr->r);
+        vector<pair<int, pair<int, double >>> mobjs = expansion->expand(sr->r);
         for (const auto & mobj: mobjs){
             double aggDist = getAggDist(mobj.second.first, mobj.second.second);
             if (aggDist < sr->r){
@@ -72,9 +69,11 @@ public:
     }
 };
 
-static double SafeRegion::velocity() {return 0;}
+SafeRegion* SafeRegion::sr = NULL;
 
-static double SafeRegion::getAggDist(int eid, double pos) {
+double SafeRegion::velocity() {return 0;}
+
+double SafeRegion::getAggDist(int eid, double pos) {
 
     int snid = Graph::getEdgeStart(eid);
     int enid = Graph::getEdgeEnd(eid);
@@ -82,16 +81,16 @@ static double SafeRegion::getAggDist(int eid, double pos) {
 
     double res = d;
 
-    for (int i = 1; i < sr->nl; i++){
+    for (int i = 1; i < SafeRegion::sr->nl; i++){
         d = min(PartialMatrix::getDist(snid, i), PartialMatrix::getDist(enid, i));
         res = sr->agg(res, d);
     }
     return  res;
 }
 
-static void SafeRegion::update(int mid, int eid, double pos) {
+void SafeRegion::update(int mid, int eid, double pos) {
 
-    pair<int, double > oldPair = MovingObject::getP(mid);
+//    pair<int, double > oldPair = MovingObject::getP(mid);
 
 //    if (oldPair.second != DBL_MAX)
 //        double dold = getAggDist(oldPair.first, oldPair.second);
@@ -137,7 +136,7 @@ static void SafeRegion::update(int mid, int eid, double pos) {
 
 }
 
-static void SafeRegion::forceUpdate(int mid, int eid, double pos) {
+void SafeRegion::forceUpdate(int mid, int eid, double pos) {
 
     printf("force update %d %d %lf\n", mid, eid, pos);
 
@@ -146,13 +145,13 @@ static void SafeRegion::forceUpdate(int mid, int eid, double pos) {
     DistElements h;
 
     h.push(Graph::getEdgeStart(eid), NODE, mid, MOVING_OBJECT, pos);
-    h.push(Graph::getEdgeEnd(eid), NODE, mid, MOVING_OBJECT, pos);
+    h.push(Graph::getEdgeEnd(eid), NODE, mid, MOVING_OBJECT, Graph::getEdgeLen(eid) - pos);
 
     vector<int> lm = Graph::getEdgeLmrks(eid);
     for (int i = 0; i < lm.size(); i++)
         h.push(lm[i], LANDMARK, mid, MOVING_OBJECT, pos);
 
-    unordered_set<pair<int, ElemType >> isVis;
+    ElementSet isVis;
 
     int cnt = 0;
 
@@ -164,7 +163,7 @@ static void SafeRegion::forceUpdate(int mid, int eid, double pos) {
         h.pop();
 
         pair<int, ElemType > curElem = p.getStartNode();
-        if (isVis.find(curElem) != isVis.end()) continue;
+        if (isVis.isExist(curElem)) continue;
         isVis.insert(curElem);
 
         if (curElem.second == NODE){
@@ -177,7 +176,7 @@ static void SafeRegion::forceUpdate(int mid, int eid, double pos) {
 
                     pair<int, double> lmrk = Graph::getLmrkById(l);
 
-                    if (isVis.find(pair<int, ElemType >(lmrk.first, LANDMARK)) != isVis.end())
+                    if (isVis.isExist(pair<int, ElemType >(lmrk.first, LANDMARK)))
                         continue;
 
                     double dist = 0;
@@ -194,7 +193,7 @@ static void SafeRegion::forceUpdate(int mid, int eid, double pos) {
             }
 
             for (size_t i = 0; i < adjNodes.size(); i++){
-                if (isVis.find(pair<int, ElemType >(adjNodes[i], NODE)) != isVis.end())
+                if (isVis.isExist(pair<int, ElemType >(adjNodes[i], NODE)))
                     continue;
 
                 double dist = Graph::getEdgeLen(adjEdges[i]) + p.getDist();

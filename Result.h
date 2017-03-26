@@ -39,7 +39,7 @@ private:
 public:
 
     static void buildResult(int k){
-        resPtr = new Result();
+        Result::resPtr = new Result();
         resPtr->k = k;
         resPtr->res.clear();
     }
@@ -56,10 +56,10 @@ public:
         return false;
     }
 
-    static void pop(){
-        pop_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
-        resPtr->res.pop_back();
-    }
+//    static void pop(){
+//        pop_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
+//        resPtr->res.pop_back();
+//    }
 
     static void push(pair<int, double > p){
         resPtr->res.push_back(p);
@@ -78,6 +78,8 @@ public:
     }
 
 };
+
+Result* Result::resPtr = NULL;
 
 
 #endif //CAKNNSR_RESULT_H

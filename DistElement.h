@@ -20,7 +20,45 @@
 
 using namespace std;
 
-const enum ElemType {NODE, MOVING_OBJECT, LANDMARK};
+enum ElemType  {NODE=0, MOVING_OBJECT, LANDMARK};
+
+
+class ElementSet{
+
+private:
+    bitset<64> getKey(int id, ElemType elemType){
+        bitset<64> k;
+        k |= id;
+        k <<= 32;
+        k |= elemType;
+        return k;
+    }
+
+//    pair<int, ElemType > getElement(bitset<64> k){
+//        int id = (int)(k >> 32).to_ulong();
+//        ElemType elemType = (ElemType) k.to_ulong();
+//        return pair<int, ElemType >(id, elemType);
+//    };
+
+    unordered_set<bitset<64>> elementSet;
+
+public:
+
+    void insert(pair<int, ElemType> elem){
+        bitset<64> k = getKey(elem.first, elem.second);
+        elementSet.insert(k);
+    }
+
+    bool isExist(pair<int, ElemType> elem){
+        bitset<64> k = getKey(elem.first, elem.second);
+        return elementSet.find(k) != elementSet.end();
+    }
+
+    void erase(pair<int, ElemType> elem){
+        bitset<64> k = getKey(elem.first, elem.second);
+        elementSet.erase(k);
+    }
+};
 
 class DistElement{
 private:
@@ -36,6 +74,8 @@ private:
 
 public:
 
+    DistElement() : strtId(0), endId(0), dist(DBL_MAX){}
+
     DistElement(int strtId, ElemType sType, int endId, ElemType eType, double d):
             strtId(strtId), startElemType(sType), endId(endId), endElemType(eType),
             dist(d){}
@@ -45,7 +85,7 @@ public:
     }
 
     bool operator () (DistElement& a, DistElement& b) const {
-        return a.dist < b.dist;
+        return a.dist > b.dist;
     }
 
     pair<int, ElemType > getStartNode(){return pair<int, ElemType >(strtId, startElemType);}
@@ -73,7 +113,7 @@ public:
     }
 
     DistElement top(){
-        if (h.empty())  return DistElement(-1, DistElement::NODE, -1, DistElement::NODE, DBL_MAX);
+        if (h.empty())  return DistElement(-1, ElemType ::NODE, -1, ElemType ::NODE, DBL_MAX);
         else return h.top();
     }
 
