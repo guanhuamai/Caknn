@@ -101,9 +101,17 @@ public:
     };
 
     static vector<int> getAdjacentEdge(int nid){
-        if (nid < 0 || nid >= nodes.size()) return NULL;
-        vector<int> graph = nodes[nid].adjEdges;
-        return graph;
+        vector<int> res;
+        if (nid >= 0 && nid < graph->nodes.size())
+            res = graph->nodes[nid].adjEdges;
+        return res;
+    }
+
+    static vector<int> getAdjacentNode(int nid){
+        vector<int> res;
+        if (nid >= 0 && nid < graph->nodes.size())
+            res = graph->nodes[nid].adjNodes;
+        return res;
     }
 
     static int getEdgeStart(int eid){
@@ -127,7 +135,7 @@ public:
         return pair<int, int>(graph->nodes[i].x, graph->nodes[i].y);
     };
 
-    static void initLmrks(vector<pair<int, double >> lmrks){
+    static void initLmrks(vector<pair<int, double >>& lmrks){
         graph->lmrks = lmrks;
         graph->hsLmrk.clear();
         for (int i = 0; i < lmrks.size(); i++){
@@ -145,6 +153,10 @@ public:
     static pair<int, double > getLmrkById(int lmrkId){
         return graph->lmrks[lmrkId];
     };
+
+    static int getNumLmrks(){
+        return graph->lmrks.size();
+    }
 };
 
 
