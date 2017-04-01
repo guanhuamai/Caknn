@@ -15,9 +15,11 @@
 #include <cfloat>
 #include <sstream>
 #include <fstream>
+#include <functional>
 #include <iostream>
 
 using namespace std;
+
 
 class Utility{
     template<typename Out>

@@ -2,8 +2,8 @@
 // Created by mgh on 3/26/17.
 //
 
-#ifndef CAKNNSR_SLEEXPANSION_H
-#define CAKNNSR_SLEEXPANSION_H
+#ifndef CAKNNSR_ILE_MIN_EXPANSION_H
+#define CAKNNSR_ILE_MIN_EXPANSION_H
 
 #include <algorithm>
 #include <vector>
@@ -20,26 +20,25 @@
 #include "Graph.h"
 
 
-class SLEExpansion : public BaseExpansion{
+class IleMinExpansion : public BaseExpansion{
 private:
     DistElements distElements;
 
-    vector<ElementSet> visited;  // visited[i]: (0, N - 1): node;
+    ElementSet visited;  // visited[i]: (0, N - 1): node;
 
     int expandCount;
 
     bool isVisit(int frm, pair<int, ElemType> to){
-        if (frm >= visited.size())  cout << "illegal landmark id triggered" << endl;
-        return visited[frm].isExist(to); }
+        return visited.isExist(to); }
 
     void visit(int frm, pair<int, ElemType> to){
-        visited[frm].insert(to);
+        visited.insert(to);
     }
 
 public:
 
-    SLEExpansion(unsigned int numLmrks){
-        visited = vector<ElementSet>(numLmrks, ElementSet());
+    IleMinExpansion(unsigned int numLmrks){
+        visited = ElementSet();
         expandedRange = DBL_MAX;
         expandCount = 0;
     }
@@ -50,19 +49,16 @@ public:
         cout << "***********" << endl;
         cout << "display sle expansion:" << endl;
         distElements.display();
-        for (const auto&  e: visited){
-            e.display();
-        }
-        cout << "expanded for " << expandCount << " times" << endl;
+        visited.display();
+        cout << "expanded for " << expandCount << "times" << endl;
         cout << "***********" << endl;
     }
 };
 
-unordered_set<int> SLEExpansion::expand(double r){
-    if ((expandedRange == DBL_MAX || r > expandedRange) && r != DBL_MAX) expandCount++;
+unordered_set<int> IleMinExpansion::expand(double r){
+    if (r > expandedRange) expandedRange = r;
 
-    if (expandedRange != DBL_MAX) expandedRange = max(r, expandedRange);
-    else expandedRange = r;
+    if (r > expandedRange && r != DBL_MAX) expandCount++;
 
     if (r == DBL_MAX)
         return unordered_set<int>();
@@ -122,3 +118,4 @@ unordered_set<int> SLEExpansion::expand(double r){
 }
 
 #endif //CAKNNSR_SLEEXPANSION_H
+

@@ -13,7 +13,8 @@
 #include "Result.h"
 #include "DistElement.h"
 #include "BaseExpansion.h"
-
+#include "LC.h"
+#include "MAD.h"
 
 using namespace std;
 
@@ -32,6 +33,11 @@ private:
     static void forceUpdate(int mid, int eid, double pos);
     static double velocity();
     static double getAggDist(int eid, double pos);
+
+    static void updateLC(unordered_set<int>& expandedEdges);
+    static void updateMAD(unordered_set<int>& expandedEdges);
+    static void updateOpf(unordered_set<int>& expandedEdges);
+
 
 public:
 
@@ -58,14 +64,28 @@ public:
     static void update(int mid, int eid, double pos);
 
     static void expand(BaseExpansion* expansion){
-        vector<pair<int, pair<int, double >>> mobjs = expansion->expand(sr->r);
-        for (const auto & mobj: mobjs){
-            double aggDist = getAggDist(mobj.second.first, mobj.second.second);
+//        cout << "start expanding &&&&&&&&&&&&&&&&&&&&&&& r = " << sr->r << endl;
+        unordered_set<int> mobjs = expansion->expand(sr->r);
+//        cout << "opf before " << endl;
+//        Opf::display();
+        for (const auto & mobjId: mobjs){
+            auto mobjPos = MovingObject::getP(mobjId);
+
+            double aggDist = getAggDist(mobjPos.first, mobjPos.second);
+
+            if (mobjId == 4155){
+                bool tmp = mobjId == 4155;
+                cout << "catch mobjid" << endl;
+                cout << mobjId << endl;
+            }
+
             if (aggDist < sr->r){
-                Opf::insert(mobj.first, mobj.second.first,
-                            mobj.second.second, aggDist);
+                Opf::insert(mobjId, aggDist);
             }
         }
+//        cout << "opf after " << endl;
+//        Opf::display();
+//        cout << "end expanding &&&&&&&&&&&&&&&&&&&&&&& r= " << sr->r << endl;
     }
 };
 
@@ -75,26 +95,28 @@ double SafeRegion::velocity() {return 0;}
 
 double SafeRegion::getAggDist(int eid, double pos) {
 
-    int snid = Graph::getEdgeStart(eid);
-    int enid = Graph::getEdgeEnd(eid);
-    double d = min(PartialMatrix::getDist(snid, 0), PartialMatrix::getDist(enid, 0));
+    double res = sr->agg(1, 2) == 1 ? DBL_MAX : sr->agg(1, 2) == 2 ? DBL_MIN : 0;
 
-    double res = d;
+    int snid(Graph::getEdgeStart(eid)), enid(Graph::getEdgeEnd(eid));
+    for (int i = 0; i < sr->nl; i++){
+        double ds = PartialMatrix::getDist(snid, i);
+        double de = PartialMatrix::getDist(enid, i);
 
-    for (int i = 1; i < SafeRegion::sr->nl; i++){
-        d = min(PartialMatrix::getDist(snid, i), PartialMatrix::getDist(enid, i));
+        double d = DBL_MAX;
+
+        if (ds != DBL_MAX) d = min(d, ds + pos);
+        if (de != DBL_MAX) d = min(d, de + Graph::getEdgeLen(eid) - pos);
+
+        if (eid == Graph::getLmrkById(i).first)
+            d = min(d, abs(pos - Graph::getEdgeLen(eid)));
+
         res = sr->agg(res, d);
     }
-    return  res;
+
+    return res;
 }
 
 void SafeRegion::update(int mid, int eid, double pos) {
-
-//    pair<int, double > oldPair = MovingObject::getP(mid);
-
-//    if (oldPair.second != DBL_MAX)
-//        double dold = getAggDist(oldPair.first, oldPair.second);
-
     MovingObject::updateP(mid, eid, pos);  // update in moving object database unconditionally...
 
     if (eid != -1 && sr->dk == DBL_MAX) {  // not a deleted moving object...
@@ -103,35 +125,21 @@ void SafeRegion::update(int mid, int eid, double pos) {
 
         double di = getAggDist(eid, pos);
 
-        if (di < sr->r) Opf::insert(mid, eid, pos, di);  // update opf according to new aggregate distance
-        else Opf::erase(mid);
+        if (di < sr->r) Opf::insert(mid, di);  // update opf according to new aggregate distance
+        else  Opf::erase(mid);
 
-        if (Result::isExist(mid)) {
-            Result::erase(mid);
-        }
-
-        sr->dk = Result::getKthDist();
-
-        if (di < sr->dk) {
-            pair<int, double> p(mid, di);
-            Result::push(p);
-            sr->dk = Result::getKthDist();
-        }
-
-        if (sr->dk == DBL_MAX) {
-            pair<int, double> p = Opf::getMin();
-            while (sr->dk == DBL_MAX && p != Opf::USE_LESS_PAIR) {
-                if (!Result::isExist(p.first)) {
-                    Result::push(p);
-                    sr->dk = Result::getKthDist();
-                }
-            }
+        if (Result::exist(mid) || di < sr->dk) { // rebuild if the moving object is in the result.
+            int k = Result::getK();
+            vector<pair<int, double>> kOpfs = Opf::getNSmallest(k);
+            Result::rebuild(kOpfs);
         }
     }
 
     sr->dk = Result::getKthDist();
     if (sr->dk != DBL_MAX) {
-        sr->r = sr->dk + velocity();
+        if (sr->r != DBL_MAX)
+            sr->r = max(sr->r, sr->dk + velocity());
+        else sr->r = sr->dk + velocity();
     }
 
 }
@@ -147,9 +155,9 @@ void SafeRegion::forceUpdate(int mid, int eid, double pos) {
     h.push(Graph::getEdgeStart(eid), NODE, mid, MOVING_OBJECT, pos);
     h.push(Graph::getEdgeEnd(eid), NODE, mid, MOVING_OBJECT, Graph::getEdgeLen(eid) - pos);
 
-    vector<int> lm = Graph::getEdgeLmrks(eid);
-    for (int i = 0; i < lm.size(); i++)
-        h.push(lm[i], LANDMARK, mid, MOVING_OBJECT, pos);
+    unordered_set<int> lmrks = Graph::getEdgeLmrks(eid);
+    for (const auto& lm: lmrks)
+        h.push(lm, LANDMARK, mid, MOVING_OBJECT, abs(Graph::getLmrkById(lm).second - pos));
 
     ElementSet isVis;
 
@@ -171,12 +179,12 @@ void SafeRegion::forceUpdate(int mid, int eid, double pos) {
             vector<int> adjEdges = Graph::getAdjacentEdge(curElem.first);
 
             for (const auto& e: adjEdges){
-                vector<int> adjLmrks = Graph::getEdgeLmrks(e);
+                unordered_set<int> adjLmrks = Graph::getEdgeLmrks(e);
                 for (const auto& l: adjLmrks){
 
                     pair<int, double> lmrk = Graph::getLmrkById(l);
 
-                    if (isVis.isExist(pair<int, ElemType >(lmrk.first, LANDMARK)))
+                    if (isVis.isExist(pair<int, ElemType >(l, LANDMARK)))
                         continue;
 
                     double dist = 0;
@@ -209,8 +217,71 @@ void SafeRegion::forceUpdate(int mid, int eid, double pos) {
         }
     }
 
-    Opf::insert(mid, eid, pos, aggV);
+    Opf::insert(mid, aggV);
     Result::push(pair<int, double>(mid, aggV));
+}
+
+void SafeRegion:: updateLC(unordered_set<int>& expandedEdges){
+    for (const auto& e: expandedEdges) {
+        int snid = Graph::getEdgeStart(e);
+        int enid = Graph::getEdgeEnd(e);
+
+        double len = Graph::getEdgeLen(e);
+
+        for (int i = 0; i < sr->nl; i++) {
+            if (!PartialMatrix::isExist(snid, i) || !PartialMatrix::isExist(enid, i))
+                continue;
+            double dx = PartialMatrix::getDist(snid, i);
+            double dy = PartialMatrix::getDist(enid, i);
+            if (abs(dy - dx - len) < 0.0001){
+                LC::insert(e, i, X_LANDMARK);
+            }else if (abs(dx - dy - len) < 0.0001){
+                LC::insert(e, i, Y_LANDMARK);
+            }else{
+                LC::insert(e, i, Z_LANDMARK);
+            }
+
+        }
+    }
+}
+
+
+void SafeRegion::updateMAD(unordered_set<int>& expandedEdges){
+    for (const auto& e: expandedEdges) {
+        int snid = Graph::getEdgeStart(e);
+        int enid = Graph::getEdgeEnd(e);
+        double len = Graph::getEdgeLen(e);
+        unordered_set<int> lmrks = Graph::getEdgeLmrks(e);
+
+        bool giveUp = false;
+        for (int i = 0; i < sr->nl; i++){
+            if (!PartialMatrix::isExist(snid, i)) {
+                giveUp = true;
+                break;
+            }
+            if (!PartialMatrix::isExist(enid, i)){
+                giveUp = true;
+                break;
+            }
+        }
+
+        if (giveUp) continue;
+
+        double lowBound = DBL_MAX;
+
+        double aggS = getAggDist(e, 0);
+        double aggE = getAggDist(e, len);
+
+        lowBound = min(aggS, aggE);
+
+        for (const auto& lmrkId: lmrks){
+            auto lmrk = Graph::getLmrkById(lmrkId);
+            lowBound = min(lowBound, getAggDist(lmrk.first, lmrk.second));
+        }
+
+        MAD::insert(e, lowBound);
+
+    }
 }
 
 #endif //CAKNNSR_SAFEREGION_H

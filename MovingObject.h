@@ -87,6 +87,11 @@ public:
 
     static pair<int, double> getP(int pid) {return read(pid);}
 
+    static unordered_set<int> getPidFromE(int eid){
+        if (hsObj.find(eid) == hsObj.end())  return unordered_set<int>();
+        return hsObj[eid];
+    }
+
     static vector<pair<int, pair<int, double>>> getPFromE(int eid){  // get moving objects from edge
         if (hsObj.find(eid) == hsObj.end())  return vector<pair<int, pair<int, double>>>(0);
         vector<pair<int, pair<int, double>>> res;

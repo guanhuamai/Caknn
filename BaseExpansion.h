@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <queue>
+#include <set>
 
 #include "MovingObject.h"
 #include "PartialMatrix.h"
@@ -20,6 +21,9 @@
 using namespace std;
 
 class BaseExpansion{
+protected:
+    double expandedRange;
+
 public:
     virtual bool isVisit(int frm, pair<int, ElemType> to){
         cout << "not implemented isVisit function called";
@@ -30,11 +34,14 @@ public:
         cout << "not implemented visit function called";
     }
 
-    virtual vector<pair<int, pair<int, double >>> expand(double r){
+    virtual unordered_set<int> expand(double r){
         cout << "not implemented expand function called";
-        return  vector<pair<int, pair<int, double >>>();
+        return  unordered_set<int>();
     }
 
+    virtual void display() const {}
+
+    double getExpandedRange(){return expandedRange;}
 };
 
 

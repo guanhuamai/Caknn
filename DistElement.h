@@ -17,11 +17,13 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <hash_fun.h>
 
 using namespace std;
 
 enum ElemType  {NODE=0, MOVING_OBJECT, LANDMARK};
 
+const char* ELEM_TYPE_STRS [] = {"NODE", "MOVING_OBJECT", "LANDMARK"};
 
 class ElementSet{
 
@@ -34,11 +36,13 @@ private:
         return k;
     }
 
-//    pair<int, ElemType > getElement(bitset<64> k){
-//        int id = (int)(k >> 32).to_ulong();
-//        ElemType elemType = (ElemType) k.to_ulong();
-//        return pair<int, ElemType >(id, elemType);
-//    };
+
+
+    pair<int, ElemType > getElement(bitset<64> k) const {
+        int id = (int)(k >> 32).to_ulong();
+        ElemType elemType = (ElemType) k.to_ulong();
+        return pair<int, ElemType >(id, elemType);
+    };
 
     unordered_set<bitset<64>> elementSet;
 
@@ -58,6 +62,17 @@ public:
         bitset<64> k = getKey(elem.first, elem.second);
         elementSet.erase(k);
     }
+
+    void display() const {
+        cout << "display ElementSet" << endl;
+        for (const auto& e: elementSet){
+            auto p = getElement(e);
+            cout << "id: " << p.first
+                 << " type: " << ELEM_TYPE_STRS[p.second]
+                 << endl;
+        }
+        cout << "--------------" << endl;
+    }
 };
 
 class DistElement{
@@ -69,8 +84,6 @@ private:
 
     ElemType startElemType;
     ElemType endElemType;
-
-
 
 public:
 
@@ -90,7 +103,7 @@ public:
 
     pair<int, ElemType > getStartNode(){return pair<int, ElemType >(strtId, startElemType);}
 
-    pair<int, ElemType > getEndNode(){return pair<int, ElemType >(strtId, startElemType);}
+    pair<int, ElemType > getEndNode(){return pair<int, ElemType >(endId, endElemType);}
 
     double getDist(){ return dist;}
 
@@ -124,6 +137,59 @@ public:
     }
 
     bool empty(){return h.empty();}
+
+    void display() const {
+        priority_queue<DistElement, vector<DistElement>, DistElement> tmp = h;
+        cout << "display DistElements:" << endl;
+        while (!tmp.empty()){
+            auto p = tmp.top();
+            cout << "start node: id: " << p.getStartNode().first
+                 << " type: " << ELEM_TYPE_STRS[p.getStartNode().second]
+                 << " end node: id: " << p.getEndNode().first
+                 << " type: " << ELEM_TYPE_STRS[p.getEndNode().second]
+                 << " dist: " << p.getDist()
+                 << endl;
+            tmp.pop();
+        }
+        cout << "-----------" << endl;
+    }
 };
+
+
+
+//int main(){
+//    ElementSet s;
+//
+//    for (int i = 0; i < 10; i++){
+//        s.insert(pair<int, ElemType >(i % 4, (ElemType)(i % 4)));
+//    }
+//
+//    for (int i = 0; i < 10; i++){
+//        for (int j = 0; j < 4; j++){
+//            pair<int, ElemType > tmp(i, (ElemType) j);
+//            if (s.isExist(tmp)){
+//                cout << tmp.first << " " << tmp.second << "exists" << endl;
+//            }else{
+//                cout << tmp.first << " " << tmp.second << "not exists" << endl;
+//            }
+//        }
+//    }
+//
+//    for (int i = 0; i < 2; i++){
+//        s.erase(pair<int, ElemType >(i % 4, (ElemType)(i % 4)));
+//    }
+//
+//    for (int i = 0; i < 10; i++){
+//        for (int j = 0; j < 4; j++){
+//            pair<int, ElemType > tmp(i, (ElemType) j);
+//            if (s.isExist(tmp)){
+//                cout << tmp.first << " " << tmp.second << "exists" << endl;
+//            }else{
+//                cout << tmp.first << " " << tmp.second << "not exists" << endl;
+//            }
+//        }
+//    }
+//    return 0;
+//}
 
 #endif //CAKNNSR_DISTELEM_H

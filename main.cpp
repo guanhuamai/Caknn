@@ -6,6 +6,7 @@
 #include "SafeRegion.h"
 #include "SLEExpansion.h"
 #include "Query.h"
+#include "IleMinExpansion.h"
 
 using namespace std;
 
@@ -39,7 +40,15 @@ void sdb(BaseExpansion* sdb, vector<int> old, vector<int> newI, vector<int> newE
     for (size_t i = 0; i < nn; i++){
         SafeRegion::update(newI[i], newE[i], newP[i]);
         SafeRegion::expand(sdb);
+//        Opf::display();
+//        PartialMatrix::display();
     }
+    Opf::display();
+    Result::display();
+}
+
+long long getThroughPut(int timeCost, int taskNum){
+    return ((long long)taskNum * 50) / timeCost;
 }
 
 void doExperiment(const char* path, const char* dataName,
@@ -56,7 +65,7 @@ void doExperiment(const char* path, const char* dataName,
     MovingObject::setDB(DBNAME);
     vector<pair<int, double>> lmrks = readLmrks(lmrkPath.str());
     lmrks.resize(numLmrks);
-    function<double (double, double)> aggfunc = Utility::aggsum;
+    function<double (double, double)> aggfunc = Utility::aggmax;
 
 
     SafeRegion::buildSafeRegion(nodePath.str(), edgePath.str(), lmrks, k, aggfunc);
@@ -67,12 +76,14 @@ void doExperiment(const char* path, const char* dataName,
     string line = "";
     BaseExpansion* sle = new SLEExpansion(numLmrks);
 
+    string movObjPathStr = movObjPath.str();
     ifstream mfile(movObjPath.str().c_str());
     while (readMovObj(mfile, old, mobjI, mobjE, mobjPos, line, flag)) {
         printf("things are %zu %zu %zu %zu\n", old.size(), mobjI.size(), mobjE.size(), mobjPos.size());
         sdb(sle, old, mobjI, mobjE, mobjPos);
     }
 
+    sle->display();
 
     delete sle;
     mfile.close();
@@ -80,10 +91,12 @@ void doExperiment(const char* path, const char* dataName,
 
 int main()
 {
+//    freopen("log", "w", stdout);
     chrono::time_point<chrono::system_clock> strt, end;
     strt = chrono::system_clock::now();
-    doExperiment("/home/mgh/codes/C++/CaknnSR/test/", "test", 1, 50000, 3, 50, false);
+    doExperiment("/home/mgh/codes/C++/CaknnSR/data/", "alaska", 2, 50000, 3, 50, true);
     end  = chrono::system_clock::now();
     chrono::duration<double > elapsed = end - strt;
+    cout <<  "through put per 50ms: " << getThroughPut(int(elapsed.count() * 1000), 2507598) << endl;
     return 0;
 }

@@ -43,25 +43,28 @@ bool readMovObj1(ifstream& mfile, vector<int>& old,
 
             if (snid > enid) swap(snid, enid);
 
-            if (splitStr[0] == "disappearpoint")  old.push_back(oid);
+            if (splitStr[0] == "disappearpoint")  {
+                old.push_back(oid);
+            }else {
 
-            newI.push_back(oid);
+                newI.push_back(oid);
 
-            vector<int> adjN = Graph::getAdjacentNode(snid);  //g.nodes[snid].adjNodes;
-            vector<int> adjE = Graph::getAdjacentEdge(snid);
+                vector<int> adjN = Graph::getAdjacentNode(snid);  //g.nodes[snid].adjNodes;
+                vector<int> adjE = Graph::getAdjacentEdge(snid);
 
-            for (int i = 0; i < adjN.size(); i++){
-                if (adjN[i] == enid) {
-                    newE.push_back(adjE[i]);
-                    break;
+                for (int i = 0; i < adjN.size(); i++) {
+                    if (adjN[i] == enid) {
+                        newE.push_back(adjE[i]);
+                        break;
+                    }
                 }
+                pair<double, double> coord = Graph::getNodeCoordinates(snid);
+                double dist = Utility::euclidDist(coord.first, coord.second, x, y);
+                double elen = Graph::getEdgeLen(newE[newE.size() - 1]);
+                dist = dist > 0 ? dist : 0;
+                dist = dist < elen ? dist : elen;
+                newP.push_back(dist);
             }
-            pair<double, double> coord = Graph::getNodeCoordinates(snid);
-            double dist = Utility::euclidDist(coord.first, coord.second, x, y);
-            double elen = Graph::getEdgeLen(newE[newE.size() - 1]);
-            dist = dist > 0 ? dist : 0;
-            dist = dist < elen ? dist : elen;
-            newP.push_back(dist);
 
             getline(mfile, line);
         }
@@ -75,54 +78,17 @@ bool readMovObj2(ifstream& mfile, vector<int>& old,
                 string& line){
 
     newI.clear(), old.clear(), newE.clear(), newP.clear();
-
-    int round = -1;
-
-    if (line == "") getline(mfile, line);
-
-    if (line == "") return false;  // when the line is "" return false to finish checking...
-
-    if (mfile.is_open()){
-        while (line != ""){
-            vector<string> splitStr = Utility::split(line, '\t');
-
-            int tmpround = Utility::my_stoi(splitStr[4]);
-
-            if (tmpround != round && round != -1) return true;
-
-            round = tmpround;
-
-            int  oid(Utility::my_stoi(splitStr[1])),
-                    snid(Utility::my_stoi(splitStr[7])),
-                    enid(Utility::my_stoi(splitStr[8]));
-            double x(Utility::my_stof(splitStr[5])), y(Utility::my_stof(splitStr[6]));
-
-            if (snid > enid) swap(snid, enid);
-
-            if (splitStr[0] == "disappearpoint")  old.push_back(oid);
-
-            newI.push_back(oid);
-
-            vector<int> adjN = Graph::getAdjacentNode(snid);  //g.nodes[snid].adjNodes;
-            vector<int> adjE = Graph::getAdjacentEdge(snid);
-
-            for (int i = 0; i < adjN.size(); i++){
-                if (adjN[i] == enid) {
-                    newE.push_back(adjE[i]);
-                    break;
-                }
-            }
-            pair<double, double> coord = Graph::getNodeCoordinates(snid);
-            double dist = Utility::euclidDist(coord.first, coord.second, x, y);
-            double elen = Graph::getEdgeLen(newE[newE.size() - 1]);
-            dist = dist > 0 ? dist : 0;
-            dist = dist < elen ? dist : elen;
-            newP.push_back(dist);
-
-            getline(mfile, line);
-        }
+    int n = 0;
+    mfile >> n;
+    for (int i = 0; i < n; i++){
+        int mid, eid;
+        double pos;
+        mfile >> mid >> eid >> pos;
+        newI.push_back(mid);
+        newE.push_back(eid);
+        newP.push_back(pos);
     }
-    return true;
+    return n > 0;
 }
 
 

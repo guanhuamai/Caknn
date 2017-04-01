@@ -44,7 +44,7 @@ class Graph{ // singleton
     vector<Edge> edges;
     vector<Node> nodes;
 
-    unordered_map<int, vector<int>> hsLmrk;  // landmark hash key: eid, val: lmid
+    unordered_map<int, unordered_set<int>> hsLmrk;  // landmark hash key: eid, val: lmid
     vector<pair<int, double>> lmrks;  // landmarks   pair: 1st
 
     Graph(){}  // singleton
@@ -137,14 +137,19 @@ public:
         graph->lmrks = lmrks;
         graph->hsLmrk.clear();
         for (int i = 0; i < lmrks.size(); i++){
-            if (graph->hsLmrk.find(i) == graph->hsLmrk.end()){
-                graph->hsLmrk[i] = vector<int>();
+            if (graph->hsLmrk.find(lmrks[i].first) == graph->hsLmrk.end()){
+                graph->hsLmrk[lmrks[i].first] = unordered_set<int>();
             }
-            graph->hsLmrk[i].push_back(i);
+            graph->hsLmrk[lmrks[i].first].insert(i);
         }
     }
 
-    static vector<int> getEdgeLmrks(int eid){
+    static bool isLmrkInEdge(int lid, int eid){
+        if (eid >= graph->hsLmrk.size()) return false;
+        return graph->hsLmrk.find(lid) != graph->hsLmrk.end();
+    }
+
+    static unordered_set<int> getEdgeLmrks(int eid){
         return graph->hsLmrk[eid];
     }
 

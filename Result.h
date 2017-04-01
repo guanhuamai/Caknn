@@ -49,21 +49,35 @@ public:
         return DBL_MAX;
     }
 
-    static bool isExist(int mid){
+    static bool exist(int mid){
         for (const auto &e : resPtr->res){
             if (e.first == mid) return true;
         }
         return false;
     }
 
-//    static void pop(){
-//        pop_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
-//        resPtr->res.pop_back();
-//    }
+    static int getK(){
+        return resPtr->k;
+    }
+
+    static void rebuild(vector<pair<int, double>>& candidates){
+        resPtr->res.clear();
+        for(const auto& e: candidates){
+            push(e);
+        }
+    }
+
+    static void pop(){
+        pop_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
+        resPtr->res.pop_back();
+    }
 
     static void push(pair<int, double > p){
         resPtr->res.push_back(p);
-        push_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
+        make_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
+        while(resPtr->res.size() > resPtr->k){
+            pop();
+        }
     }
 
     static void erase(int mid){
@@ -75,6 +89,14 @@ public:
         if (i < resPtr->res.size()){
             resPtr->res.erase(resPtr->res.begin() + i);
         }
+        make_heap(resPtr->res.begin(), resPtr->res.end(), cmp);
+    }
+
+    static void display(){
+        for (auto p: resPtr->res){
+            cout << "mid: " << p.first << "   aggregate value: " << p.second << endl;
+        }
+
     }
 
 };

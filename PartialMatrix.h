@@ -17,7 +17,6 @@
 #include <fstream>
 #include <iostream>
 
-
 using namespace std;
 
 
@@ -33,6 +32,13 @@ private:
         k |= lid;
         return k;
     }
+
+    static pair<int, int> reverseKey(bitset<64> k){
+        pair<int, int> res;
+        res.first = (int)(k >> 32).to_ulong();
+        res.second = (int)k.to_ulong();
+        return res;
+    };
 
     static PartialMatrix* pm;
 
@@ -55,6 +61,16 @@ public:
         if (pm->m.find(k) != pm->m.end()) return pm->m[k];
         else return DBL_MAX;
     }
+
+    static void display(){
+        cout << "display partial matrix" << endl;
+        for (const auto &k : pm->m){
+            pair<int, int> p = reverseKey(k.first);
+            cout << "nid: " << p.first << " lid: " << p.second << " dist: " << k.second << endl;
+        }
+        cout << endl;
+    }
+
 };
 
 PartialMatrix* PartialMatrix::pm = NULL;
