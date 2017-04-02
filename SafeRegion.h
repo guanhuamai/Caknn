@@ -27,10 +27,19 @@ private:
     double dk;
     int nl; // number of landmarks
 
+    int lcCnt;
+    int madCnt;
+
+    bool useLC; // determine whether to use LC to accelerate aggregate distance calculation
+    bool useMAD; //determine whether to use MAD to prune moving objects from opf
+
 
     function<double (double, double)> agg;
 
+    // no range at the beginning, generate the initial range
     static void forceUpdate(int mid, int eid, double pos);
+
+    // set to 0. don't need to distinguish safe region and opf region
     static double velocity();
     static double getAggDist(int eid, double pos);
 
@@ -38,54 +47,83 @@ private:
     static void updateMAD(unordered_set<int>& expandedEdges);
     static void updateOpf(unordered_set<int>& expandedEdges);
 
+    static double getAggDistByLC(int eid, double pos){  // return DBL_MAX if not work
+        if (!sr->useLC || !LC::isEdgeClassified(eid)) return DBL_MAX;
+
+        int snid = Graph::getEdgeStart(eid);
+        int enid = Graph::getEdgeEnd(eid);
+        double len = Graph::getEdgeLen(eid);
+
+        set<int>* xLandmarks = LC::getLandmark(eid, X_LANDMARK);
+        set<int>* yLandmarks = LC::getLandmark(eid, Y_LANDMARK);
+        set<int>* zLandmarks = LC::getLandmark(eid, Z_LANDMARK);
+
+        double res = sr->agg(1, 2) == 1 ? DBL_MAX : sr->agg(1, 2) == 2 ? DBL_MIN : 0;
+        if (xLandmarks != NULL)
+            for (const auto& e: *xLandmarks){
+                res = sr->agg(res, PartialMatrix::getDist(snid, e) + pos);
+            }
+
+        if (yLandmarks != NULL)
+            for (const auto& e: *yLandmarks){
+                res = sr->agg(res, PartialMatrix::getDist(enid, e) + len - pos);
+            }
+
+        if (zLandmarks != NULL)
+            for (const auto& e: *zLandmarks){
+                double d = min(PartialMatrix::getDist(snid, e) + pos,
+                               PartialMatrix::getDist(enid, e) + len - pos);
+                if (eid == Graph::getLmrkById(e).first){
+                    d = min(d, abs(pos - len));
+                }
+                res = sr->agg(res, d);
+            }
+        sr->lcCnt ++;
+
+        return res;
+    }
 
 public:
 
+
     static SafeRegion* sr;
 
-    static void buildSafeRegion(string nodeF, string edgeF,
-                                vector<pair<int, double>>& lmrks,
-                                int k,
-                                function<double (double, double)> agg){
-        Graph::graphFactory(nodeF, edgeF);
-        Graph::initLmrks(lmrks);
-
-        PartialMatrix::buildPartialMatrix();
-        Opf::buildOpf();
-        Result::buildResult(k);
+    static void buildSafeRegion(int nl, function<double (double, double)> agg,
+                                bool useLC, bool useMAD){
+        destructSafeRegion();
 
         sr = new SafeRegion();
 
+        sr->lcCnt = 0;
+        sr->madCnt = 0;
         sr->agg = agg;
-        sr->nl = Graph::getNumLmrks();
+        sr->nl = nl;
+        sr->useLC = useLC;
+        sr->useMAD = useMAD;
     }
 
 
+    static void destructSafeRegion(){
+        if (sr != NULL){
+            delete(sr);
+            sr = NULL;
+        }
+    }
+
+    static int getlcCnt(){return sr->lcCnt;}
+
+    static int getmadCnt(){return sr->madCnt;}
+
     static void update(int mid, int eid, double pos);
 
-    static void expand(BaseExpansion* expansion){
-//        cout << "start expanding &&&&&&&&&&&&&&&&&&&&&&& r = " << sr->r << endl;
-        unordered_set<int> mobjs = expansion->expand(sr->r);
-//        cout << "opf before " << endl;
-//        Opf::display();
-        for (const auto & mobjId: mobjs){
-            auto mobjPos = MovingObject::getP(mobjId);
+    static int expand(BaseExpansion* expansion){  // return the number of expanded edges
+        unordered_set<int> expandedEdges = expansion->expand(sr->r);
+        if (sr->useLC) updateLC(expandedEdges);
+        if (sr->useMAD) updateMAD(expandedEdges);
 
-            double aggDist = getAggDist(mobjPos.first, mobjPos.second);
+        updateOpf(expandedEdges);
 
-            if (mobjId == 4155){
-                bool tmp = mobjId == 4155;
-                cout << "catch mobjid" << endl;
-                cout << mobjId << endl;
-            }
-
-            if (aggDist < sr->r){
-                Opf::insert(mobjId, aggDist);
-            }
-        }
-//        cout << "opf after " << endl;
-//        Opf::display();
-//        cout << "end expanding &&&&&&&&&&&&&&&&&&&&&&& r= " << sr->r << endl;
+        return (unsigned) expandedEdges.size();
     }
 };
 
@@ -94,6 +132,8 @@ SafeRegion* SafeRegion::sr = NULL;
 double SafeRegion::velocity() {return 0;}
 
 double SafeRegion::getAggDist(int eid, double pos) {
+    double lcRes = getAggDistByLC(eid, pos);
+    if (lcRes != DBL_MAX) return lcRes;  // calculate distance successfully with lc
 
     double res = sr->agg(1, 2) == 1 ? DBL_MAX : sr->agg(1, 2) == 2 ? DBL_MIN : 0;
 
@@ -119,19 +159,28 @@ double SafeRegion::getAggDist(int eid, double pos) {
 void SafeRegion::update(int mid, int eid, double pos) {
     MovingObject::updateP(mid, eid, pos);  // update in moving object database unconditionally...
 
-    if (eid != -1 && sr->dk == DBL_MAX) {  // not a deleted moving object...
+    if (eid != -1 && sr->dk == DBL_MAX) {  // normal object and range not expanded...
         forceUpdate(mid, eid, pos);
     }else {
 
-        double di = getAggDist(eid, pos);
+        if (MAD::getLowbound(eid) > sr->r) {  // MAD pruning
+            sr->madCnt ++;
+            Opf::erase(mid);
+            if (Result::exist(mid)) {
+                vector<pair<int, double>> kOpfs = Opf::getNSmallest(Result::getK());
+                Result::rebuild(kOpfs);
+            }
+        }else {
 
-        if (di < sr->r) Opf::insert(mid, di);  // update opf according to new aggregate distance
-        else  Opf::erase(mid);
+            double di = getAggDist(eid, pos);
 
-        if (Result::exist(mid) || di < sr->dk) { // rebuild if the moving object is in the result.
-            int k = Result::getK();
-            vector<pair<int, double>> kOpfs = Opf::getNSmallest(k);
-            Result::rebuild(kOpfs);
+            if (di < sr->r) Opf::insert(mid, di);  // update opf according to new aggregate distance
+            else Opf::erase(mid);
+
+            if (Result::exist(mid) || di < sr->dk) { // rebuild if the moving object is in the result.
+                vector<pair<int, double>> kOpfs = Opf::getNSmallest(Result::getK());
+                Result::rebuild(kOpfs);
+            }
         }
     }
 
@@ -245,7 +294,6 @@ void SafeRegion:: updateLC(unordered_set<int>& expandedEdges){
     }
 }
 
-
 void SafeRegion::updateMAD(unordered_set<int>& expandedEdges){
     for (const auto& e: expandedEdges) {
         int snid = Graph::getEdgeStart(e);
@@ -283,5 +331,19 @@ void SafeRegion::updateMAD(unordered_set<int>& expandedEdges){
 
     }
 }
+
+void SafeRegion::updateOpf(unordered_set<int> &expandedEdges) {
+    for (const auto &e: expandedEdges){
+        auto edgeMobjs = MovingObject::getPFromE(e);
+        for (const auto &mobj: edgeMobjs){
+            double aggDist = getAggDist(mobj.second.first, mobj.second.second);
+
+            if (aggDist < sr->r) {
+                Opf::insert(mobj.first, aggDist);
+            }
+        }
+    }
+}
+
 
 #endif //CAKNNSR_SAFEREGION_H

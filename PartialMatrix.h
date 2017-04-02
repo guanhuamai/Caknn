@@ -20,7 +20,7 @@
 using namespace std;
 
 
-class  PartialMatrix{  // may be modified to disk based service
+class  PartialMatrix{  // singleton: may be modified to disk based service
 private:
     PartialMatrix(){}
     unordered_map<bitset<64>, double> m; // partial distance matrix M, key: 32int + 32int
@@ -44,7 +44,17 @@ private:
 
 public:
 
-    static void buildPartialMatrix(){pm = new PartialMatrix();}
+    static void buildPartialMatrix(){
+        destructPartialMatrix();
+        pm = new PartialMatrix();
+    }
+
+    static void destructPartialMatrix(){
+        if (pm != NULL){
+            delete(pm);
+            pm = NULL;
+        }
+    }
 
     static bool isExist(int nid, int lid){
         bitset<64> k = genKey(nid, lid);

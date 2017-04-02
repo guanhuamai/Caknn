@@ -36,7 +36,7 @@ namespace std{
 
 struct PairLess{bool operator () (pair<int, double >& a, pair<int, double>& b) const { return a.second > b.second;}};
 
-class Opf{  // use to monitor safe region objects
+class Opf{  // singleton: use to monitor safe region objects
 private:
 
     // moving objects id inside of the safe region, or protential future objects
@@ -60,7 +60,17 @@ public:
 
     static pair<int, double > USE_LESS_PAIR;
 
-    static void buildOpf(){opfPtr = new Opf();}
+    static void buildOpf(){
+        destructOpf();
+        opfPtr = new Opf();
+    }
+
+    static void destructOpf(){
+        if (opfPtr != NULL){
+            delete opfPtr;
+            opfPtr = NULL;
+        }
+    }
 
     static void insert(int mid, double dist){
         if (opfPtr->opf.find(mid) == opfPtr->opf.end()

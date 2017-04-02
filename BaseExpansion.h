@@ -34,6 +34,8 @@ public:
         cout << "not implemented visit function called";
     }
 
+
+    // return expanded edges and use the edges to update Opf, LC, MAD
     virtual unordered_set<int> expand(double r){
         cout << "not implemented expand function called";
         return  unordered_set<int>();
@@ -43,7 +45,4 @@ public:
 
     double getExpandedRange(){return expandedRange;}
 };
-
-
-
 #endif //CAKNNSR_BASEEXPANSION_H

@@ -9,7 +9,7 @@
 using namespace std;
 
 
-class MAD{
+class MAD{  //singleton
 private:
     unordered_map<int, double> edgeLowbounds;
 
@@ -18,6 +18,16 @@ private:
     static MAD* madPtr;
 
 public:
+
+    static void buildMAD(){
+        destructMAD();
+        madPtr = new MAD();
+    }
+
+    static void destructMAD(){
+        if (madPtr != NULL)
+            delete madPtr, madPtr = NULL;
+    }
 
     static void insert(int eid, double aggLowbound){
         madPtr->edgeLowbounds[eid] = aggLowbound;
@@ -29,6 +39,9 @@ public:
         return 0;  // 0 will prune nothing which can elegantly stop pruning
     }
 
+
 };
+
+MAD* MAD::madPtr = NULL;
 
 #endif //CAKNNSR_MAD_H

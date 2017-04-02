@@ -51,15 +51,11 @@ class Graph{ // singleton
 
     static Graph* graph;
 
-    static bool isInit;
-
 public:
 
     //static constructor
-    static void graphFactory(string nodeF, string edgeF){
-
-        if (isInit)  return;
-        isInit = true;
+    static void buildGraph(string nodeF, string edgeF){
+        destructGraph();
 
         graph = new Graph();
         vector<string> nodeStr = Utility::readLines(nodeF);
@@ -90,6 +86,10 @@ public:
             graph->nodes[enid].adjEdges.push_back(eid);
         }
     }
+
+    static void destructGraph(){
+        if (graph != NULL) delete graph, graph = NULL;
+    };
 
     //static visit
     static vector<int> getNeighbors(int nid) {
@@ -160,9 +160,12 @@ public:
     static int getNumLmrks(){
         return graph->lmrks.size();
     }
+
+    static int getNumEdges(){
+        return graph->edges.size();
+    }
 };
 
-bool Graph::isInit = false;
 Graph* Graph::graph = NULL;
 
 //Graph::graph = NULL;

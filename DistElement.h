@@ -21,7 +21,7 @@
 
 using namespace std;
 
-enum ElemType  {NODE=0, MOVING_OBJECT, LANDMARK};
+enum ElemType{NODE=0, MOVING_OBJECT, LANDMARK};
 
 const char* ELEM_TYPE_STRS [] = {"NODE", "MOVING_OBJECT", "LANDMARK"};
 
@@ -35,8 +35,6 @@ private:
         k |= elemType;
         return k;
     }
-
-
 
     pair<int, ElemType > getElement(bitset<64> k) const {
         int id = (int)(k >> 32).to_ulong();

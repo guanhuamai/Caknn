@@ -22,7 +22,7 @@ using namespace std;
 
 
 
-class Result{
+class Result{  // singleton: used this class to quickly find the kth aggregate distance
 private:
     static bool cmp(pair<int, double >& p1, pair<int, double >& p2){
         return p1.second < p2.second;
@@ -39,9 +39,17 @@ private:
 public:
 
     static void buildResult(int k){
+        destructResult();
         Result::resPtr = new Result();
         resPtr->k = k;
         resPtr->res.clear();
+    }
+
+    static void destructResult(){
+        if (resPtr != NULL){
+            delete resPtr;
+            resPtr = NULL;
+        }
     }
 
     static double getKthDist(){

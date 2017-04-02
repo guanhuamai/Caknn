@@ -77,10 +77,10 @@ unordered_set<int> IleMinExpansion::expand(double r){
         }
     }
 
-    unordered_set<int> expandedOpf;
+    unordered_set<int> expandedEdges;
 
     while(!distElements.empty()){
-        if (distElements.top().getDist() > r) return expandedOpf;
+        if (distElements.top().getDist() > r) return expandedEdges;
 
         DistElement p = distElements.top();
         distElements.pop();
@@ -107,14 +107,10 @@ unordered_set<int> IleMinExpansion::expand(double r){
         }
 
         // update opf from adjacent node, these objects are only stored in disk
-        for (int i = 0; i < (int)adjE.size(); i++){
-            auto mObjs = MovingObject::getPidFromE(adjE[i]);
-            expandedOpf.insert(mObjs.begin(), mObjs.end());
-        }
+        expandedEdges.insert(adjE.begin(), adjE.end());
     }
 
-
-    return expandedOpf;
+    return expandedEdges;
 }
 
 #endif //CAKNNSR_SLEEXPANSION_H

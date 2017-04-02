@@ -16,13 +16,15 @@ using namespace std;
 using namespace qdbm;
 
 
-Villa* vl;
 
-class MovingObject{  // moving object during the query, not the whole moving objects
+class MovingObject{  //singleton
+private:
 
-    static unordered_map<int, unordered_set<int>> hsObj;
+    Villa* vl;
 
-    static pair<int, double > read(int key) {
+    unordered_map<int, unordered_set<int>> hsObj;
+
+    pair<int, double > read(int key) {
         char *v = NULL;
         pair<int, double> p = pair<int, double>(INT_MAX, DBL_MAX);
 
@@ -41,7 +43,7 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         return p;
     }
 
-    static void write(int pid, int eid, double pos) {
+    void write(int pid, int eid, double pos) {
         char* k = new char[100];
         char* v = new char[100];
 
@@ -57,7 +59,7 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         free(v);
     }
 
-    static void erase(int pid){
+    void erase(int pid){
         char* k = new char[100];
         memcpy(k, &pid, sizeof(int));
         try{
@@ -69,41 +71,55 @@ class MovingObject{  // moving object during the query, not the whole moving obj
         free(k);
     }
 
-    MovingObject(){}  // ban initialization
+    MovingObject(string dbname){
+        vl = new Villa(dbname.c_str(), Villa::OCREAT | Villa::OWRITER);
+        hsObj = unordered_map<int, unordered_set<int>>();
+    }
+
+    static MovingObject* movingObjectPtr;
+
 
 public:
 
-    static void closeDB(){vl->close();}
-
-    static void setDB(const char* DBNAME){vl = new Villa(DBNAME, Villa::OCREAT | Villa::OWRITER);}
-
-    static void insertP(int pid, int eid, double pos){
-//        printf("insert %d\n", pid);
-        if(hsObj.find(eid) == hsObj.end())
-            hsObj[eid] = unordered_set<int>();  // initialize the set
-        hsObj[eid].insert(pid);
-        write(pid, eid, pos);
+    static void buildMovingObject(string dbname){
+        destructMovingObject();
+        movingObjectPtr = new MovingObject(dbname);
     }
 
-    static pair<int, double> getP(int pid) {return read(pid);}
+    static void destructMovingObject(){
+        if (movingObjectPtr != NULL) {
+            movingObjectPtr->vl->close();
+            delete movingObjectPtr;
+            movingObjectPtr = NULL;
+        }
+    }
+
+
+    static void insertP(int pid, int eid, double pos){
+        if(movingObjectPtr->hsObj.find(eid) == movingObjectPtr->hsObj.end())
+            movingObjectPtr->hsObj[eid] = unordered_set<int>();  // initialize the set
+        movingObjectPtr->hsObj[eid].insert(pid);
+        movingObjectPtr->write(pid, eid, pos);
+    }
+
+    static pair<int, double> getP(int pid) {return movingObjectPtr->read(pid);}
 
     static unordered_set<int> getPidFromE(int eid){
-        if (hsObj.find(eid) == hsObj.end())  return unordered_set<int>();
-        return hsObj[eid];
+        if (movingObjectPtr->hsObj.find(eid) == movingObjectPtr->hsObj.end())  return unordered_set<int>();
+        return movingObjectPtr->hsObj[eid];
     }
 
     static vector<pair<int, pair<int, double>>> getPFromE(int eid){  // get moving objects from edge
-        if (hsObj.find(eid) == hsObj.end())  return vector<pair<int, pair<int, double>>>(0);
+        if (movingObjectPtr->hsObj.find(eid) == movingObjectPtr->hsObj.end())  return vector<pair<int, pair<int, double>>>(0);
         vector<pair<int, pair<int, double>>> res;
-        for(auto pid : hsObj[eid]) { res.push_back(pair<int, pair<int, double>>(pid, read(pid)));}
+        for(auto pid : movingObjectPtr->hsObj[eid]) { res.push_back(pair<int, pair<int, double>>(pid, movingObjectPtr->read(pid)));}
         return res;
     }
 
     static void eraseP(int pid) {
-//        printf("erase %d\n", pid);
-        pair<int, double > p = read(pid);
-        if (p.first != INT_MAX) hsObj[read(pid).first].erase(pid), erase(pid);
-//        else printf("erase failed\n");
+        pair<int, double > p = movingObjectPtr->read(pid);
+        if (p.first != INT_MAX)
+            movingObjectPtr->hsObj[movingObjectPtr->read(pid).first].erase(pid), movingObjectPtr->erase(pid);
     }
 
     static void updateP(int pid, int eid, double pos){
@@ -113,6 +129,6 @@ public:
 
 };
 
-unordered_map<int, unordered_set<int>> MovingObject::hsObj = unordered_map<int, unordered_set<int>>();
+MovingObject* MovingObject::movingObjectPtr = NULL;
 
 #endif // __MOVINGOBJECT

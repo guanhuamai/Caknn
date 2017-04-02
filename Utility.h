@@ -21,7 +21,9 @@
 using namespace std;
 
 
-class Utility{
+class Utility{ // no status utility class, used to store some stateless utility function,
+               // such as split string, or push a heap
+
     template<typename Out>
     static void split(const std::string &s, char delim, Out result) {
         std::stringstream ss;
@@ -35,6 +37,31 @@ class Utility{
     Utility(){}
 
 public:
+
+
+    static long long getThroughPut(int timeCost, int taskNum){
+        return ((long long)taskNum * 50) / timeCost;
+    }
+
+    static vector<pair<int, double>> readLmrks(string lmrkF){
+        vector<pair<int, double>> res;
+
+        vector<string> lmrkStr = readLines(lmrkF);
+        int n(my_stoi(lmrkStr[0]));
+
+        for (int i = 1; i <= n; i++){
+            vector<string> splitStr = split(lmrkStr[i], '\t');
+            int snid(my_stoi(splitStr[0])), enid(my_stoi(splitStr[1])),
+                    eid(my_stoi(splitStr[2]));
+
+            double len1(my_stof(splitStr[3])),
+                    len2(my_stof(splitStr[4]));
+
+            double len = snid < enid ? len1 : len2;
+            res.push_back(pair<int, double> (eid, len));
+        }
+        return res;
+    }
 
     static double aggmin(double a, double b){ return min(a, b);}
 
