@@ -17,7 +17,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-
+#include <cmath>
 
 using namespace std;
 

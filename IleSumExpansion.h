@@ -175,7 +175,7 @@ unordered_set<int> IleSumExpansion::expand(double r){
                     auto curLmrk = Graph::getLmrkById(adjLmrk);
 
                     if (e == sourceLmrk.first){
-                        d = fabs(sourceLmrk.second - curLmrk.second);
+                        d = abs(sourceLmrk.second - curLmrk.second);
                     }else if (Graph::getEdgeStart(e) == to.first){
                         d = p.getDist() + curLmrk.second;
                     }else if (Graph::getEdgeEnd((e) == to.second)){
