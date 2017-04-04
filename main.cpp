@@ -7,6 +7,7 @@ int main()
 
     Experiment::buildExperiment("/home/mgh/codes/C++/CaknnSR/config/experiment.config");
 
+//    freopen("stdout1", "w", stdout);
 
     strt = chrono::system_clock::now();
     Experiment::doExperiment();
@@ -14,6 +15,7 @@ int main()
 
     chrono::duration<double > elapsed = end - strt;
 
+    cout << "total time cost: " << elapsed.count() * 1000 << endl;
     cout << "through put per 50ms: " << Utility::getThroughPut(int(elapsed.count() * 1000), 2507598) << endl;
     cout << "MAD hit: " << SafeRegion::getmadCnt() << endl;
     cout << "lc hit: " << SafeRegion::getlcCnt() << endl;

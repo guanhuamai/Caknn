@@ -123,6 +123,10 @@ public:
 
         updateOpf(expandedEdges);
 
+//        if (expandedEdges.size() != 0)
+//            expansion->display();
+//        PartialMatrix::display();
+
         return (unsigned) expandedEdges.size();
     }
 };
@@ -164,6 +168,7 @@ void SafeRegion::update(int mid, int eid, double pos) {
     }else {
 
         if (MAD::getLowbound(eid) > sr->r) {  // MAD pruning
+//        if(0 > sr->r){
             sr->madCnt ++;
             Opf::erase(mid);
             if (Result::exist(mid)) {

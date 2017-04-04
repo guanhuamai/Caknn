@@ -102,7 +102,7 @@ public:
 
     static void display(){
         for (auto p: resPtr->res){
-            cout << "mid: " << p.first << "   aggregate value: " << p.second << endl;
+            printf("mid: %d   aggregate value: %.3lf\n", p.first, p.second);
         }
 
     }

@@ -1,0 +1,3 @@
+/home/mgh/codes/C++/CaknnSR/build-dir/CMakeFiles/rebuild_cache.dir
+/home/mgh/codes/C++/CaknnSR/build-dir/CMakeFiles/edit_cache.dir
+/home/mgh/codes/C++/CaknnSR/build-dir/CMakeFiles/CaknnSR.dir

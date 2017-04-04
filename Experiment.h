@@ -27,30 +27,32 @@ unordered_map<string, int> ENUM_NAME_MAP = {{"BRINKHOFF", 0}, {"COMPACT", 1},
 
 class Experiment{
 private:
-    string configFilePath;
-    string projectPath;
-    string dataName;
-    string dbname;
-    string logname;
+    string configFilePath;  // the path of the configuration file
+    string projectPath;  // the path of the projects
+    string dataName;  // the relative path of the dataset, and the data name
+    string dbname;  // the database name storing the moving objects
+    string logname;  // the name of the log
+
+    string metaConfig; // the meta configure string
 
     unsigned numLmrks;
-    unsigned numOfObjects;
+    unsigned numOfObjects;  // number of moving objects
     unsigned k;
-    unsigned objSpeed;
-    bool useLC;
-    bool useMAD;
+    unsigned objSpeed;  // speed of moving objects, use brinkhoff to control
+    bool useLC;  // whether to use LC
+    bool useMAD;  // whether to use MAD
 
 
-    chrono::duration<double > expandTime;
-    chrono::duration<double > updateTime;
-    int expandCnt;
-    int updateCnt;
+    chrono::duration<double > expandTime;  // total time consumed in expansions
+    chrono::duration<double > updateTime;  // total time consumed in updates
+    int expandCnt;  // number of expand
+    int updateCnt;  // number of update
 
     ofstream logFileStream;
 
-    TRAFFIC_FILE_TYPE traffic_file_type;
-    EXPANSION_TYPE expansion_type;
-    AGGREGATE_TYPE aggregate_type;
+    TRAFFIC_FILE_TYPE traffic_file_type;  // the file type of the moving object input file
+    EXPANSION_TYPE expansion_type;  // the expansion type supported by the algorithm
+    AGGREGATE_TYPE aggregate_type;  // the aggregate function supported in the query
 
 
     static Experiment* experiment;
@@ -64,29 +66,33 @@ private:
         ifstream configFileStream;
 
         configFileStream.open(configFile.c_str());
+        getline(configFileStream, metaConfig);
+        configFileStream.close();
 
-        configFileStream >> projectPath;
-        configFileStream >> dataName;
-        configFileStream >> dbname;  dbname = timeStr + "." + dbname;
-        configFileStream >> logname;
-        configFileStream >> numLmrks;
-        configFileStream >> numOfObjects;
-        configFileStream >> k;
-        configFileStream >> objSpeed;
+        stringstream configStream(metaConfig);
+
+        configStream >> projectPath;
+        configStream >> dataName;
+        configStream >> dbname;  dbname = timeStr + "." + dbname;
+        configStream >> logname;
+        configStream >> numLmrks;
+        configStream >> numOfObjects;
+        configStream >> k;
+        configStream >> objSpeed;
 
 
         string tmp;
-        configFileStream >> tmp;
+        configStream >> tmp;
         useLC = tmp == "useLC";
 
-        configFileStream >> tmp;
+        configStream >> tmp;
         useMAD = tmp == "useMAD";
 
-        configFileStream >> tmp;
+        configStream >> tmp;
         traffic_file_type = (TRAFFIC_FILE_TYPE) (ENUM_NAME_MAP[tmp]);
-        configFileStream >> tmp;
+        configStream >> tmp;
         expansion_type = (EXPANSION_TYPE) (ENUM_NAME_MAP[tmp]);
-        configFileStream >> tmp;
+        configStream >> tmp;
         aggregate_type = (AGGREGATE_TYPE) (ENUM_NAME_MAP[tmp]);
 
         expandTime = chrono::duration<double>::zero();
@@ -95,8 +101,6 @@ private:
         updateCnt = 0;
 
         logFileStream.open(logname.c_str(), ios_base::app);
-
-        configFileStream.close();
     }
 
     static void sdb(BaseExpansion* sdb, vector<int> old,
@@ -205,7 +209,6 @@ public:
         destructExperiment();
         experiment = new Experiment(configFile);
 
-//        freopen((timeStr + "." + experiment->logname).c_str(), "w", stdout);
 
         stringstream nodePath, edgePath, lmrkPath;
         nodePath << experiment->projectPath << experiment->dataName << ".cnode";
@@ -221,7 +224,7 @@ public:
 
         LC::buildLC((unsigned)Graph::getNumEdges(), (unsigned)Graph::getNumLmrks());
 
-        MAD::buildMAD();
+        MAD::buildMAD((unsigned)Graph::getNumEdges());
 
         if(experiment->aggregate_type == AGG_MIN){
             SafeRegion::buildSafeRegion(experiment->numLmrks, Utility::aggmin,
@@ -309,6 +312,7 @@ void Experiment::sdb(BaseExpansion* sdb, vector<int> old,
         experiment->expandTime += end - strt;
         experiment->expandCnt += numExpandedEdges == 0 ? 0 : 1;
     }
+//    PartialMatrix::display();
 //    Opf::display();
 //    Result::display();
 }
@@ -340,7 +344,8 @@ void Experiment::doExperiment(){
         sdb(sle, old, mobjI, mobjE, mobjPos);
 
         cnt += mobjI.size() + old.size();
-        if (cnt % 50000 == 0){
+        if (cnt > 500000){
+            cnt -= 500000;
             printf("things are %zu %zu %zu %zu\n", old.size(), mobjI.size(), mobjE.size(), mobjPos.size());
             Opf::display();
             Result::display();

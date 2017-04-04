@@ -5,23 +5,26 @@
 #ifndef CAKNNSR_MAD_H
 #define CAKNNSR_MAD_H
 
-#include <unordered_map>
+#include <vector>
 using namespace std;
 
 
 class MAD{  //singleton
 private:
-    unordered_map<int, double> edgeLowbounds;
+    vector<double> edgeLowbounds;
+    unsigned int numOfEdges;
 
-    MAD(){}
+    MAD(unsigned numOfEdges): numOfEdges(numOfEdges){
+        edgeLowbounds = vector<double>(numOfEdges, 0);
+    }
 
     static MAD* madPtr;
 
 public:
 
-    static void buildMAD(){
+    static void buildMAD(unsigned numOfEdges){
         destructMAD();
-        madPtr = new MAD();
+        madPtr = new MAD(numOfEdges);
     }
 
     static void destructMAD(){
@@ -34,9 +37,20 @@ public:
     }
 
     static double getLowbound(int eid){
-        if (madPtr->edgeLowbounds.find(eid) != madPtr->edgeLowbounds.end())
-            return madPtr->edgeLowbounds[eid];
-        return 0;  // 0 will prune nothing which can elegantly stop pruning
+        if (eid < 0 || eid >= madPtr->numOfEdges) return 0;
+        return madPtr->edgeLowbounds[eid];  // 0 will prune nothing which can elegantly stop pruning
+    }
+
+    static void display(){
+        cout << "-----------------display MAD ---------------" << endl;
+        cout << "-----------------number of edges------------" << endl;
+        int i = 0;
+        for (const auto& e: madPtr->edgeLowbounds){
+            if (e != 0)
+                cout << "edge: " << i++ << " min distance: "<< e << endl;
+        }
+        cout << "-----------------display MAD over---------------" << endl;
+
     }
 
 

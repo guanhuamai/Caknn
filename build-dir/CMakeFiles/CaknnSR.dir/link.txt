@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/CaknnSR.dir/main.cpp.o  -o CaknnSR  -L/usr/local/lib -Wl,-rpath,/usr/local/lib -Wl,-Bstatic -lqdbm -lxqdbm -Wl,-Bdynamic -lqdbm 
