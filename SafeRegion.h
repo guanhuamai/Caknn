@@ -74,7 +74,7 @@ private:
                 double d = min(PartialMatrix::getDist(snid, e) + pos,
                                PartialMatrix::getDist(enid, e) + len - pos);
                 if (eid == Graph::getLmrkById(e).first){
-                    d = min(d, abs(pos - len));
+                    d = min(d, fabs(pos - len));
                 }
                 res = sr->agg(res, d);
             }
@@ -152,7 +152,7 @@ double SafeRegion::getAggDist(int eid, double pos) {
         if (de != DBL_MAX) d = min(d, de + Graph::getEdgeLen(eid) - pos);
 
         if (eid == Graph::getLmrkById(i).first)
-            d = min(d, abs(pos - Graph::getEdgeLen(eid)));
+            d = min(d, fabs(pos - Graph::getEdgeLen(eid)));
 
         res = sr->agg(res, d);
     }
@@ -211,7 +211,7 @@ void SafeRegion::forceUpdate(int mid, int eid, double pos) {
 
     unordered_set<int> lmrks = Graph::getEdgeLmrks(eid);
     for (const auto& lm: lmrks)
-        h.push(lm, LANDMARK, mid, MOVING_OBJECT, abs(Graph::getLmrkById(lm).second - pos));
+        h.push(lm, LANDMARK, mid, MOVING_OBJECT, fabs(Graph::getLmrkById(lm).second - pos));
 
     ElementSet isVis;
 
@@ -287,9 +287,9 @@ void SafeRegion:: updateLC(unordered_set<int>& expandedEdges){
                 continue;
             double dx = PartialMatrix::getDist(snid, i);
             double dy = PartialMatrix::getDist(enid, i);
-            if (abs(dy - dx - len) < 0.0001){
+            if (fabs(dy - dx - len) < 0.0001){
                 LC::insert(e, i, X_LANDMARK);
-            }else if (abs(dx - dy - len) < 0.0001){
+            }else if (fabs(dx - dy - len) < 0.0001){
                 LC::insert(e, i, Y_LANDMARK);
             }else{
                 LC::insert(e, i, Z_LANDMARK);
