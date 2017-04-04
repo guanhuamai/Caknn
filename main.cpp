@@ -5,7 +5,7 @@ int main()
 {
     chrono::time_point<chrono::system_clock> strt, end;
 
-    Experiment::buildExperiment("/home/mgh/codes/C++/CaknnSR/config/experiment.config");
+    Experiment::buildExperiment("../config/experiment.config");
 
 //    freopen("stdout1", "w", stdout);
 
