@@ -205,6 +205,23 @@ private:
 
 public:
 
+    static void display(){
+        cout << "displaying Experiment:" << endl;
+        if (experiment == NULL) cout << "sorry we have nothing to tell..." << endl;
+        else{
+            cout << "data name:" << experiment->metaConfig << endl;
+            cout << "config file path:" << experiment->configFilePath << endl;
+            cout << "project path:" << experiment->projectPath << endl;
+            cout << "aggregate type:" << experiment->aggregate_type << endl;
+            cout << "k:" << experiment->k << endl;
+            cout << "number of landmark:" << experiment->numLmrks << endl;
+            cout << "use LC:" << experiment->useLC << endl;
+            cout << "use MAD:" << experiment->useMAD << endl;
+        }
+        cout << "displaying Experiment end" << endl;
+
+    }
+
     static void buildExperiment(string configFile){
         destructExperiment();
         experiment = new Experiment(configFile);
