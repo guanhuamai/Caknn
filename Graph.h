@@ -164,6 +164,16 @@ public:
     static int getNumEdges(){
         return graph->edges.size();
     }
+
+    static void display(){
+
+
+        cout << "------------displaying Graph--------------" << endl;
+        cout << "number of nodes: " << graph->nodes.size() << endl;
+        cout << "number of edges: " << graph->edges.size() << endl;
+        cout << "number of landmarks: " << graph->lmrks.size() << endl;
+        cout << "------------displaying Graph end----------" << endl;
+    }
 };
 
 Graph* Graph::graph = NULL;

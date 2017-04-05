@@ -41,6 +41,7 @@ public:
 
 
     static long long getThroughPut(int timeCost, int taskNum){
+        if (taskNum == 0 || timeCost == 0) return 0;
         return ((long long)taskNum * 50) / timeCost;
     }
 
